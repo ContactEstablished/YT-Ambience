@@ -1,6 +1,6 @@
 # Venus ambience — session handoff
 
-Last updated: **2026-09-07**, prepared for integration into `main`. This is the starting document for a new session continuing the Venus scene.
+Last updated: **2026-09-07**, integrated into `main`. This is the starting document for a new session continuing the Venus scene.
 
 ## Current state
 
@@ -94,7 +94,7 @@ Venus preview uses loopback port 5176 with `--strictPort`. If it is already runn
 
 For hot reload, stop only the verified Venus preview process and use `npm run dev:venus` from the root instead. Do not start both Venus servers on 5176. If another application owns the port, choose another available strict port and record it.
 
-The migration preview is intended to run from the main checkout's `Venus/` directory, with logs `Venus/venus-preview.log` and `Venus/venus-preview-error.log`. Do not assume the tab or server survives a restart. Do not run preview from the deleted worktree.
+The migrated preview runs from the main checkout's `Venus/` directory, with logs `Venus/venus-preview.log` and `Venus/venus-preview-error.log`. Do not assume the tab or server survives a restart. Do not run preview from the deleted worktree.
 
 ## Verification and remaining limits
 
@@ -103,7 +103,7 @@ The migration preview is intended to run from the main checkout's `Venus/` direc
 - Current texture revision: browser inspection covered desktop/mobile appearance, the expanded credits toolbar, accelerated rotation, pause, drag to another hemisphere, reset, and the seam fix. No captured console errors or warnings.
 - Physical multitouch and OS reduced-motion emulation were **not** exercised. Those handlers and hidden-tab suspension were preserved and reviewed in source; do not present that as a completed device test.
 - No automated test suite was added. The seam was visually checked in sampled orientations, not exhaustively at every angle/mip level. Inspect a full turn and poles if changing the map or UV treatment.
-- Website work remains local; the source is being integrated into Git main. No website hosting or publishing is configured.
+- Website work remains local; the source is integrated into Git main. No website hosting or publishing is configured.
 
 ## Suggested next-session workflow
 

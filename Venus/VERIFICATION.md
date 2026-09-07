@@ -1,4 +1,14 @@
-# First-version verification — 2026-09-07
+# Verification — 2026-09-07
+
+## Main integration
+
+- Venus source, assets, package/lockfile, README, and handoff are all under `Venus/`.
+- Root `dev:venus`, `build:venus`, and `preview:venus` commands forward to the isolated Venus package. Earth defaults and source are unchanged.
+- `npm --prefix Venus ci` and `npm run build:venus` passed in the main checkout. Build output is `Venus/dist/`; the former output-directory warning is gone. The non-blocking Three.js bundle-size warning remains.
+- Earth's production build and four existing lighting tests passed during integration.
+- Preview transferred to the main checkout's `Venus/` directory on port 5176. Chrome reloaded and visibly rendered the scene with controls hidden; no captured console errors/warnings. New preview PID at migration: 73184 (recheck ownership before acting on any PID).
+- Historical worktree paths and PIDs below describe earlier verification only.
+
 
 ## Reference-inspired cloud revision
 
