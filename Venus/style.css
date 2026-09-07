@@ -1,0 +1,33 @@
+:root { color-scheme: dark; font-family: Arial, Helvetica, sans-serif; color: #e4e1db; background: #020305; }
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { margin: 0; overflow: hidden; }
+main { width: 100%; height: 100svh; position: relative; }
+canvas { display: block; width: 100%; height: 100%; touch-action: none; cursor: grab; }
+canvas:active { cursor: grabbing; }
+canvas:focus-visible { outline: 1px solid #c4bbb0; outline-offset: -4px; }
+.title { position: absolute; left: 40px; top: 34px; pointer-events: none; }
+.eyebrow { font-size: 9px; letter-spacing: .24em; color: #99938a; }
+h1 { margin: 8px 0 0; font-weight: 400; font-size: 36px; letter-spacing: -.05em; }
+h1 span { color: #c3b49e; }
+.hint { position: absolute; right: 40px; top: 36px; margin: 0; color: #969189; font-size: 11px; line-height: 1.8; text-align: right; pointer-events: none; }
+.toolbar { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); display: grid; gap: 10px; width: 340px; max-width: calc(100% - 24px); padding: 16px; border: 1px solid #e8dbca22; border-radius: 9px; background: #111316ed; backdrop-filter: blur(18px); }
+label { display: flex; justify-content: space-between; font-size: 11px; color: #c0bab0; }
+output { font-variant-numeric: tabular-nums; color: #99938a; }
+input { width: 100%; margin: 0; accent-color: #c4b398; cursor: pointer; }
+.buttons { display: flex; align-items: center; justify-content: space-between; gap: 2px; }
+button { font: inherit; font-size: 11px; color: #bbb6ad; background: transparent; border: 1px solid transparent; border-radius: 5px; padding: 10px; cursor: pointer; min-height: 40px; }
+button:hover { color: #fff; background: #eadfce10; }
+button[aria-pressed="true"] { background: #eadfce10; color: #e4e1db; }
+button:focus-visible, input:focus-visible, a:focus-visible { outline: 2px solid #c4b398; outline-offset: 3px; }
+button:disabled, input:disabled { opacity: .4; cursor: wait; }
+#zoom-in, #zoom-out { font-size: 20px; width: 36px; padding: 6px; }
+.credit { text-align: center; color: #928b80; font-size: 10px; text-decoration: none; }
+.credit:hover { text-decoration: underline; }
+#status, noscript { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 13px; color: #c0bab0; text-align: center; max-width: 85vw; }
+@media (max-width: 600px) {
+  .title { left: 22px; top: 24px; }
+  h1 { font-size: 30px; }
+  .hint { top: 92px; left: 22px; right: auto; text-align: left; font-size: 10px; }
+  .toolbar { bottom: 16px; padding: 12px; }
+}
