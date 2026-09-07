@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#03070b" />
+    <meta name="description" content="A rotating Earth above a slowly moving, cratered lunar foreground." />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🌎%3C/text%3E%3C/svg%3E" />
+    <title>Earth &amp; Moon — Ambience</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <main aria-label="Earth and Moon viewer">
+      <canvas id="earth" tabindex="0" role="img" aria-label="Earth above a rotating lunar foreground. Drag or use arrow keys to rotate Earth. Scroll, pinch, or use plus and minus to resize Earth. The lunar horizon stays fixed."></canvas>
+      <div id="interface" hidden>
+      <header class="title"><span class="eyebrow">FROM THE MOON</span><h1>Earth & Moon<span>.</span></h1></header>
+      <p class="hint">Drag to rotate Earth <span>·</span> Ctrl + Shift + R to hide controls</p>
+      <div id="status" role="status" aria-live="polite">Preparing the lunar view…</div>
+      <footer class="toolbar" aria-label="Scene controls">
+        <div class="lighting-controls">
+          <label for="lighting-mode">Earth lighting</label>
+          <select id="lighting-mode">
+            <option value="default">Default</option>
+            <option value="cycle">Day–night cycle</option>
+          </select>
+          <p id="cycle-phase" hidden>Daylight · Rotation 1 of 4</p>
+          <p id="cycle-description" hidden>One rotation each: daylight, nightfall, night, dawn.</p>
+        </div>
+        <div class="speed-controls">
+          <label for="earth-speed">Earth speed <output id="earth-speed-value" for="earth-speed">1.00×</output></label>
+          <input id="earth-speed" type="range" min="0" max="20" step="0.05" value="1" />
+          <label for="moon-speed">Moon speed <output id="moon-speed-value" for="moon-speed">1.00×</output></label>
+          <input id="moon-speed" type="range" min="0" max="20" step="0.05" value="1" />
+        </div>
+        <div class="button-controls">
+        <button id="rotation" type="button" aria-pressed="true">Pause rotation</button>
+        <button id="clouds" type="button" aria-pressed="true">Clouds</button>
+        <span class="divider"></span>
+        <button id="zoom-out" type="button" aria-label="Zoom Earth out">−</button>
+        <button id="zoom-in" type="button" aria-label="Zoom Earth in">+</button>
+        <button id="reset" type="button">Reset view</button>
+        </div>
+      </footer>
+      </div>
+      <noscript>Enable JavaScript to view the interactive Earth.</noscript>
+    </main>
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>
