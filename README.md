@@ -1,5 +1,21 @@
 # YT-Ambience
 
+## Venus
+
+The Venus animation is self-contained in [`Venus/`](Venus/README.md), with its own package, local assets, and build output. Start with [`Venus/HANDOFF.md`](Venus/HANDOFF.md) when continuing its development in a new session.
+
+From the repository root:
+
+```sh
+npm --prefix Venus ci
+npm run build:venus
+npm run preview:venus
+```
+
+Open http://127.0.0.1:5176/. For hot reload, use `npm run dev:venus` instead of the Venus production preview. Earth commands below remain unchanged.
+
+## Earth and Moon
+
 Earth above a slowly rotating lunar foreground in `Earth and Moon/`, built with plain HTML, CSS, JavaScript, and Three.js. Vite provides the local server and production build.
 
 ## Run
