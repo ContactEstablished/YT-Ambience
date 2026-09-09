@@ -1,0 +1,13 @@
+{
+  "name": "yt-ambience-mercury",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1 --port 5175 --strictPort",
+    "build": "vite build --outDir dist --base ./",
+    "preview": "vite preview --outDir dist --host 127.0.0.1 --port 5175 --strictPort"
+  },
+  "dependencies": { "three": "0.185.1" },
+  "devDependencies": { "vite": "6.4.3" }
+}
