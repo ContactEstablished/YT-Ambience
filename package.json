@@ -1,0 +1,20 @@
+{
+  "name": "yt-ambience-earth",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite \"Earth and Moon\" --host 127.0.0.1",
+    "build": "vite build \"Earth and Moon\" --outDir ../dist",
+    "preview": "vite preview \"Earth and Moon\" --outDir ../dist --host 127.0.0.1",
+    "dev:venus": "npm --prefix Venus run dev",
+    "build:venus": "npm --prefix Venus run build",
+    "preview:venus": "npm --prefix Venus run preview"
+  },
+  "dependencies": {
+    "three": "0.185.1"
+  },
+  "devDependencies": {
+    "vite": "6.4.3"
+  }
+}
