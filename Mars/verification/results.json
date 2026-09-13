@@ -1,0 +1,20 @@
+{
+  "date": "2026-09-13T11:40:07.888Z",
+  "browser": "151.0.7922.34",
+  "results": [
+    "Reduced motion starts with the entire scene stationary and controls hidden",
+    "Independent orbit speed moves moons while Mars is stopped; pause freezes animation",
+    "Mars spin runs independently; reset restores both speeds, orientation, phases, and zoom",
+    "Drag, arrow keys, wheel, keyboard zoom, and zoom buttons respond correctly",
+    "Preference changes pause/resume motion; hidden-tab lifecycle suspends time advancement",
+    "Built page loads all imagery, models, and Draco locally under /Mars/, without console errors",
+    "Static 0/50/75/100% lighting renders distinctly; loop toggle preserves static shadow; reset restores 20%",
+    "Full four-rotation loop reaches nightfall, night, dawn, and daylight; pause and zero Mars speed freeze it",
+    "Visible explorer launcher, nine detailed landing cards, search, events, body statistics, and close/reset pass",
+    "Facts, source links, location placement/filtering, true-scale moon tracking, pause, return, reset, and 30x zoom pass",
+    "Location flight, labeled highlight, overlapping-event priority, 15-second hold, continued moon orbits, resume, and paused-state preservation pass",
+    "Mobile pinch zoom, reset, and portrait/landscape control layout pass",
+    "Missing Mars texture, either moon model, or decoder displays an error with disabled controls",
+    "Unavailable WebGL and actual context loss both display recovery messages"
+  ]
+}

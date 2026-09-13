@@ -1,0 +1,20 @@
+{
+  "name": "yt-ambience-mars",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "dev": "vite --host 127.0.0.1 --port 5177 --strictPort",
+    "build": "vite build --outDir dist --base ./",
+    "preview": "vite preview --outDir dist --host 127.0.0.1 --port 5177 --strictPort",
+    "test:browser": "npm run build && node tests/browser-check.mjs"
+  },
+  "dependencies": {
+    "three": "0.185.1"
+  },
+  "devDependencies": {
+    "playwright": "1.62.1",
+    "vite": "6.4.3"
+  }
+}

@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#020305" />
+    <meta name="description" content="A slowly rotating Mars with Phobos and Deimos in a quiet star field." />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='42' fill='%23c47850'/%3E%3C/svg%3E" />
+    <link rel="stylesheet" href="./style.css" />
+    <title>Mars — Ambience</title>
+  </head>
+  <body>
+    <main aria-label="Mars viewer">
+      <canvas id="mars" tabindex="0" role="img" aria-label="Mars with orbiting Phobos and Deimos. Drag or use arrow keys to rotate the system; scroll, pinch, or use plus and minus to zoom. Ctrl Shift R reveals controls."></canvas>
+      <div id="status" role="status" aria-live="polite">Preparing Mars…</div>
+      <button id="explore-launch" type="button" aria-pressed="false" aria-controls="fact-navigation" title="Landings, locations, events, and planet/moon statistics">Explore Mars</button>
+      <div id="fact-markers" hidden aria-label="Clickable facts and locations"></div>
+      <div id="moon-locators" hidden aria-label="True-scale moon locators"></div>
+      <nav id="fact-navigation" hidden aria-label="Explore Mars and its moons">
+        <div class="explorer-heading"><h2>Explore Mars</h2><button id="close-explorer" type="button" aria-label="Close explorer">×</button></div>
+        <p class="control-description">Planet & moon statistics</p>
+        <div class="body-links">
+          <button type="button" data-body="mars">Mars facts</button>
+          <button type="button" data-body="phobos">Phobos facts</button>
+          <button type="button" data-body="deimos">Deimos facts</button>
+        </div>
+        <label for="fact-category">Landings, locations & events</label>
+        <select id="fact-category">
+          <option value="all">All locations & events</option>
+          <option value="Feature">Surface features</option>
+          <option value="Landing site">Landing sites</option>
+          <option value="Event">Notable events</option>
+        </select>
+        <label for="location-index" class="sr-only">Find a location or event</label>
+        <select id="location-index"></select>
+        <label for="fact-search" class="sr-only">Search locations, dates, and mission details</label>
+        <input id="fact-search" type="search" placeholder="Search missions, places, dates…" autocomplete="off" />
+        <p id="fact-results" class="control-description" role="status" aria-live="polite"></p>
+        <div id="location-list" aria-label="Location and event results"></div>
+        <p class="control-description">Click a square for facts. Click a moon to center it in front of Mars.</p>
+      </nav>
+      <aside id="fact-card" hidden aria-labelledby="fact-title">
+        <button type="button" id="close-fact" aria-label="Close facts">Close ×</button>
+        <div id="fact-content"></div>
+      </aside>
+      <div class="focus-bar">
+        <span id="focus-status" hidden></span>
+        <button id="return-mars" type="button" hidden>Back to Mars</button>
+      </div>
+      <div id="interface" hidden>
+        <section class="toolbar" aria-label="Scene controls">
+          <header class="settings-heading">
+            <div class="title"><span class="eyebrow">THE RED PLANET</span><h1>Mars<span>.</span></h1></div>
+            <button id="close-settings" type="button" aria-label="Close settings">×</button>
+          </header>
+          <p class="hint">Drag to rotate · Scroll to zoom closer<br>Click a moon to center it</p>
+          <label for="lighting-mode">Mars lighting</label>
+          <select id="lighting-mode">
+            <option value="static">Static shadow</option>
+            <option value="cycle">Day/night loop</option>
+          </select>
+          <div id="shadow-controls" class="control-group">
+            <label for="shadow">Shadow coverage <output id="shadow-value" for="shadow">20%</output></label>
+            <input id="shadow" type="range" min="0" max="100" step="1" value="20" aria-describedby="shadow-description" />
+            <p id="shadow-description" class="control-description">0% fully lit · 100% night side<br>Night terrain stays 8% illuminated.</p>
+          </div>
+          <div id="cycle-details" class="control-group" hidden>
+            <p id="cycle-phase" class="control-description">Daylight · Rotation 1 of 4 · 0% shadow</p>
+            <p class="control-description">One rotation each: daylight, nightfall, night, dawn.<br>Loop speed follows Mars rotation speed.</p>
+          </div>
+          <label for="speed">Mars rotation speed <output id="speed-value" for="speed">1.00×</output></label>
+          <input id="speed" type="range" min="0" max="20" step="0.05" value="1" />
+          <label for="orbit-speed">Moon orbit speed <output id="orbit-speed-value" for="orbit-speed">1.00×</output></label>
+          <input id="orbit-speed" type="range" min="0" max="20" step="0.05" value="1" />
+          <label for="moon-scale">Moon scale & distance</label>
+          <select id="moon-scale">
+            <option value="illustrated">Illustrated — visible moons</option>
+            <option value="true">True size & distance</option>
+          </select>
+          <p id="scale-description" class="control-description">Moon sizes enlarged and distances compressed for visibility.</p>
+          <button id="facts" type="button" aria-pressed="false" aria-controls="fact-navigation">Facts, landings & statistics: off</button>
+          <div class="buttons">
+            <button id="rotation" type="button" aria-pressed="true">Pause animation</button>
+            <button id="zoom-out" type="button" aria-label="Zoom Mars out">−</button>
+            <button id="zoom-in" type="button" aria-label="Zoom Mars in">+</button>
+            <button id="reset" type="button">Reset view</button>
+          </div>
+          <span class="credit">Mars: <a href="https://astrogeology.usgs.gov/search/map/mars_viking_colorized_global_mosaic_232m" target="_blank" rel="noopener noreferrer">NASA / USGS</a> · Moons: <a href="https://github.com/Buggy1111/earth-pulse/blob/9063c6b60dfb12268931833855f3774526fdcf06/docs/DATOVE-ZDROJE.md" target="_blank" rel="noopener noreferrer">NASA VTAD / earth-pulse</a></span>
+          <span class="credit">Motion is accelerated for ambience.</span>
+        </section>
+      </div>
+      <noscript>Enable JavaScript to view Mars.</noscript>
+    </main>
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>

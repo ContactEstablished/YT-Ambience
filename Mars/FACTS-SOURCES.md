@@ -1,0 +1,28 @@
+# Facts and coordinates — verified 2026-09-12
+
+The fact catalog is local code in `src/facts.js`. Cards cite their source pages; clicking a source is the only action that opens an external website. Published reference numbers are separate from the accelerated animation and are not presented as live telemetry. The catalog contains three body cards, two geographic features, nine detailed NASA landing cards, and three event markers (Ingenuity flight, Phoenix water confirmation, and Opportunity's mission conclusion).
+
+Landing descriptions and statistics are drawn from NASA's mission pages for [Viking](https://science.nasa.gov/mission/viking/), [Pathfinder](https://science.nasa.gov/mission/mars-pathfinder/), [Spirit](https://science.nasa.gov/mission/mer-spirit/), [Opportunity](https://science.nasa.gov/mission/mer-opportunity/), [Phoenix](https://science.nasa.gov/mission/mars-phoenix/), [Curiosity](https://science.nasa.gov/mission/msl-curiosity/), [InSight](https://science.nasa.gov/mission/insight/), and [Perseverance](https://science.nasa.gov/mission/mars-2020-perseverance/). Dates and coordinates continue to use the Mars24 reference below. Some NASA narrative pages use US local landing dates; the cards consistently retain UTC landing dates. The Opportunity conclusion marker is explicitly a regional reference at the original landing site, not the final rover position.
+
+Mars's approximate equatorial surface rotation speed is derived as `2π × 3,390 km / (24.623 × 3,600 s)`, or about 240 m/s.
+
+## Body data and real-scale geometry
+
+- [NASA Mars facts](https://science.nasa.gov/mars/facts/): mean radius, approximate solar distance/year, temperature range, and geographic context.
+- [NASA/JPL Mars at a glance](https://www.jpl.nasa.gov/news/press_kits/insight/landing/facts/mars-at-a-glance/): solar-day duration. The sidereal spin is about 24.623 Earth hours; a solar day is about 24.660 hours. These are deliberately labeled separately.
+- [NASA Phobos](https://science.nasa.gov/mars/moons/phobos/) and [NASA Deimos](https://science.nasa.gov/mars/moons/deimos/): approximate dimensions, discovery dates, crater characteristics, and surface descriptions. Phobos temperature endpoints are published measurements, not global constants.
+- [JPL satellite mean elements, MAR099](https://ssd.jpl.nasa.gov/sats/elem/): Phobos orbital semimajor axis 9,375 km and period 0.3187 days; Deimos 23,457 km and 1.2625 days. Distances are from Mars's center. Approximate altitude subtracts the 3,390 km mean Mars radius. True-size mesh normalization uses the largest published dimension (27 km or 15 km), retaining each model's shape and orientation. This is approximate size and mean-distance scaling, not a full eccentric/inclined ephemeris.
+- Speeds are **derived circular approximations**, using `2π × mean orbital radius / period`. Moon solar days are derived from `1 / (1 / orbital period − 1 / Mars year)`, ignoring small eccentricity/inclination effects. The moons share Mars's approximately 687-Earth-day solar year; their much shorter orbits around Mars are labeled separately.
+- Discovery dates reproduce NASA's page convention (Phobos August 17, Deimos August 11, 1877). Other sources may use dates one day later under different historical time conventions. The cards label these “NASA date” rather than UTC.
+- [ESA/JAXA Hera thermal observations](https://www.esa.int/ESA_Multimedia/Images/2025/03/Mars_and_Deimos_viewed_by_Hera_s_TIRI): the March 12, 2025 flyby and qualitative Deimos thermal behavior. The cited report does not supply a global numeric Deimos temperature range, so the card explicitly says that rather than inventing one.
+
+## Surface markers and history
+
+- [NASA GISS Mars24 lander list](https://www.giss.nasa.gov/tools/mars24/help/landers.html): all nine NASA landing dates and positions, rounded to 0.01°. Landing dates are UTC. No mission's present operational status or current rover position is inferred from this older reference page.
+- [USGS/IAU Olympus Mons](https://planetarynames.wr.usgs.gov/Feature/4453): 18.65°N, 226.20°E, approximately 610 km feature diameter.
+- [USGS/IAU Hellas Planitia](https://planetarynames.wr.usgs.gov/Feature/2432): approximate regional center 42.43°S, 70.50°E; the gazetteer includes several historical control-network definitions. This marker is regional, not a survey-grade location.
+- [NASA Ingenuity first flight](https://science.nasa.gov/resource/nasas-ingenuity-mars-helicopter-successfully-completes-first-flight-2/): April 19, 2021 milestone. Its marker uses the nearby Perseverance landing location as an explicitly labeled **regional reference**, not a claimed exact takeoff coordinate.
+
+All surface markers use latitude north-positive and longitude east-positive, wrapped at the texture seam. Markers follow the rotating Mars mesh and are hidden on its far side or outside the viewport. Overlapping markers are suppressed; the indexed list still provides access to every entry. Moon fact squares are suppressed when Mars occludes them. Separate true-scale sonar locators reveal projected positions even during occultation and display only each moon's name. Their fixed pixel sizes are UI affordances, not physical moon dimensions. Centered moon focus intentionally enlarges and repositions the selected moon in front of Mars; true-size orbital placement is restored on return to the overview.
+
+To extend the catalog, add sourced body statistics or location entries to `src/facts.js`. Use a clear observation date for changing information, specify the distance reference body, distinguish solar and sidereal periods, and label any approximate location or calculated quantity.
