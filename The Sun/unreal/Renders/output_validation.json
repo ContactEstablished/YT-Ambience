@@ -1,0 +1,26 @@
+{
+  "passed": true,
+  "video": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 1920,
+        "height": 1080,
+        "r_frame_rate": "30/1",
+        "nb_frames": "360"
+      }
+    ],
+    "format": {
+      "duration": "12.000000",
+      "size": "8753044"
+    }
+  },
+  "source_frames": 360,
+  "unique_frames": 360,
+  "minimum_global_mean_rgb": 18.282289255401235,
+  "maximum_global_mean_rgb": 19.034249131944446,
+  "largest_adjacent_global_brightness_change_percent": 0.06684370283547923,
+  "note": "Global brightness and frame continuity are checked; this does not prove absence of local aliasing or shimmer."
+}

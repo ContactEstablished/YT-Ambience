@@ -1,0 +1,25 @@
+{
+  "scene_frames": [
+    1,
+    239
+  ],
+  "step": 2,
+  "video_fps": 15,
+  "duration_seconds": 8,
+  "resolution": [
+    960,
+    540
+  ],
+  "samples": 32,
+  "controls": {
+    "rotation_speed": 1.0,
+    "surface_flow": 1.0,
+    "sunspots": 1.0,
+    "flare_activity": 1.0,
+    "flare_intensity": 1.0,
+    "corona_glow": 1.0,
+    "sun_size": 1.0,
+    "stars": true,
+    "seed": 73491
+  }
+}

@@ -9,7 +9,10 @@
     "preview": "vite preview \"Earth and Moon\" --outDir ../dist --host 127.0.0.1",
     "dev:venus": "npm --prefix Venus run dev",
     "build:venus": "npm --prefix Venus run build",
-    "preview:venus": "npm --prefix Venus run preview"
+    "preview:venus": "npm --prefix Venus run preview",
+    "dev:sun": "vite \"The Sun\" --host 127.0.0.1",
+    "build:sun": "vite build \"The Sun\" --outDir ../dist-sun",
+    "preview:sun": "vite preview \"The Sun\" --outDir ../dist-sun --host 127.0.0.1"
   },
   "dependencies": {
     "three": "0.185.1"

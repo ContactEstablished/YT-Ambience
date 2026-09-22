@@ -1,0 +1,19 @@
+{
+  "blender": "5.2.1 LTS",
+  "seed": 73491,
+  "seconds": 60,
+  "fps": 30,
+  "event_count": 77,
+  "objects": 232,
+  "engine": "CYCLES",
+  "controls": {
+    "rotation_speed": 1.0,
+    "surface_flow": 1.0,
+    "sunspots": 1.0,
+    "flare_activity": 1.0,
+    "flare_intensity": 1.0,
+    "corona_glow": 1.0,
+    "sun_size": 1.0
+  },
+  "stars": true
+}

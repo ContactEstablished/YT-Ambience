@@ -1,0 +1,7 @@
+{
+  "frames": 120,
+  "minimum_mean_rgb": 23.116937371399178,
+  "maximum_mean_rgb": 23.51306970164609,
+  "largest_adjacent_mean_change_percent": 0.2432578812788665,
+  "note": "Global brightness continuity check; does not prove absence of local flicker or denoising shimmer."
+}

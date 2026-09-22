@@ -14,6 +14,15 @@ npm run preview:venus
 
 Open http://127.0.0.1:5176/. For hot reload, use `npm run dev:venus` instead of the Venus production preview. Earth commands below remain unchanged.
 
+## The Sun
+
+A rotating Golden plasma Sun with flares and a breathing corona, in [`The Sun/`](The%20Sun/README.md). It shares the root package with Earth and Moon. Blender and Unreal editions of the same Sun live in `The Sun/blender/` and `The Sun/unreal/`. Start with [`The Sun/HANDOFF.md`](The%20Sun/HANDOFF.md) when continuing its development.
+
+```sh
+npm install
+npm run dev:sun
+```
+
 ## Earth and Moon
 
 Earth above a slowly rotating lunar foreground in `Earth and Moon/`, built with plain HTML, CSS, JavaScript, and Three.js. Vite provides the local server and production build.

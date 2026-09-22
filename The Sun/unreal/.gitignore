@@ -1,0 +1,12 @@
+Binaries/
+DerivedDataCache/
+Intermediate/
+Saved/
+Renders/Frames/
+Renders/LookDev/
+Renders/*.log
+Renders/*_error.txt
+Renders/*_errors.txt
+Scripts/__pycache__/
+.vs/
+*.sln

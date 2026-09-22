@@ -1,0 +1,38 @@
+{
+  "engine": "5.8.2-56702186+++UE5+Release-5.8",
+  "mesh_actors": 6,
+  "cameras": 1,
+  "native_materials": [
+    "M_Photosphere",
+    "M_Corona",
+    "M_MagneticLoops",
+    "M_PlasmaEjections",
+    "M_EjectaParticles",
+    "M_Stars"
+  ],
+  "full_precision_meshes": [
+    "MagneticLoops",
+    "PlasmaEjections",
+    "EjectaParticles",
+    "CoronaPlane",
+    "StarField"
+  ],
+  "controls": {
+    "SolarTime": 8.0,
+    "RotationSpeed": 1.0,
+    "SurfaceFlow": 1.0,
+    "Sunspots": 1.0,
+    "FlareActivity": 1.5,
+    "FlareIntensity": 1.0,
+    "CoronaGlow": 1.0,
+    "SunSize": 1.0,
+    "Stars": 1.0
+  },
+  "fps": 30,
+  "frame_range": [
+    0,
+    360
+  ],
+  "passed": true,
+  "scope": "Saved asset structure, material output links, precision, controls, and sequence; no desktop UI automation."
+}

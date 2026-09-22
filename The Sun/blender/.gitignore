@@ -1,0 +1,7 @@
+*.blend1
+*.blend2
+__pycache__/
+renders/preview_frames/
+renders/frames/
+renders/*.log
+renders/reopen_check.png

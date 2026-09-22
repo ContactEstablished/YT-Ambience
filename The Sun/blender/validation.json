@@ -1,0 +1,30 @@
+{
+  "blender": "5.2.1 LTS",
+  "checks_passed": 4626,
+  "driver_evaluations_checked": 4225,
+  "frames_checked": [
+    1,
+    180,
+    500,
+    1200,
+    1800
+  ],
+  "functional_checks": [
+    "Saved scene opens without blocked driver execution",
+    "Surface flow 0 freezes all photosphere noise phases",
+    "Flares continue while surface flow is 0",
+    "Flare activity does not retime photosphere noise",
+    "Maximum activity enables 72 magnetic loops",
+    "Activity 0 disables every loop and plume",
+    "Photosphere evolves while flares are disabled",
+    "Sunspots 0 removes the magnetic dark mask",
+    "Sunspots 0 retains magnetic loops",
+    "Flare intensity 0 hides all flare geometry",
+    "Corona glow 0 removes volume emission",
+    "Stars toggle hides the star field",
+    "Sun size updates the entire solar rig",
+    "Rotation 0 holds the rig orientation"
+  ],
+  "external_assets_required": false,
+  "note": "Checks evaluate scene data and drivers; interactive GUI usability is not automated."
+}

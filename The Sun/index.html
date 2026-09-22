@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#080301" />
+    <meta name="description" content="A living, rotating 3D Sun with evolving sunspots, solar flares, and a breathing corona." />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E☀️%3C/text%3E%3C/svg%3E" />
+    <title>The Sun — Ambience</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <main aria-label="Interactive Sun viewer">
+      <canvas id="sun" tabindex="0" role="img" aria-label="A rotating golden Sun. Drag or use arrow keys to rotate; scroll, pinch, or use plus and minus to resize. Press Control Shift R to reveal controls."></canvas>
+      <div id="status" role="status" aria-live="polite">Igniting the Sun…</div>
+      <div id="interface" hidden>
+        <header class="title"><span class="eyebrow">A STUDY IN SOLAR MOTION</span><h1>The Sun<span>.</span></h1><p>01 / Golden plasma</p></header>
+        <p class="hint">Drag to rotate <span>·</span> Ctrl + Shift + R to hide controls</p>
+        <footer class="toolbar" aria-label="Sun controls">
+          <div class="panel-heading"><span class="live-dot"></span> SOLAR OBSERVATORY <span id="state-label">LIVE</span></div>
+          <div class="speed-controls">
+            <label for="rotation-speed">Rotation <output id="rotation-speed-value" for="rotation-speed">1.00×</output></label>
+            <input id="rotation-speed" type="range" min="0" max="20" step="0.05" value="1" />
+            <label for="surface-flow">Surface flow <output id="surface-flow-value" for="surface-flow">1.00×</output></label>
+            <input id="surface-flow" type="range" min="0" max="3" step="0.05" value="1" title="Speed of the mixing and flowing surface; independent of flares." />
+            <label for="sunspots">Sunspots <output id="sunspots-value" for="sunspots">1.00×</output></label>
+            <input id="sunspots" type="range" min="0" max="3" step="0.05" value="1" title="Coverage and darkness of magnetic sunspots. Zero removes the spots." />
+            <label for="flare-activity">Flare activity <output id="flare-activity-value" for="flare-activity">1.00×</output></label>
+            <input id="flare-activity" type="range" min="0" max="3" step="0.05" value="1" title="Number and frequency of loops and eruptions. Zero turns them off." />
+            <label for="flares">Flare intensity <output id="flares-value" for="flares">1.00×</output></label>
+            <input id="flares" type="range" min="0" max="3" step="0.05" value="1" />
+            <label for="corona">Corona glow <output id="corona-value" for="corona">1.00×</output></label>
+            <input id="corona" type="range" min="0" max="2" step="0.05" value="1" />
+          </div>
+          <div class="button-controls">
+            <button id="pause" type="button" aria-pressed="false">Pause scene</button>
+            <button id="stars" type="button" aria-pressed="true">Stars</button>
+            <span class="divider"></span>
+            <button id="zoom-out" type="button" aria-label="Zoom Sun out">−</button>
+            <button id="zoom-in" type="button" aria-label="Zoom Sun in">+</button>
+            <button id="reset" type="button">Reset view</button>
+          </div>
+        </footer>
+      </div>
+      <noscript>Enable JavaScript to view the Sun.</noscript>
+    </main>
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>
