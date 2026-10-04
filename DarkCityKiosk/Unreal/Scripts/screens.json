@@ -1,0 +1,42 @@
+{
+  "slide_seconds": 7.5,
+  "transition_seconds": 0.8,
+  "screens": {
+    "LeftA_0": {
+      "type": "ad", "size": [1024, 1920], "offset": 0.0,
+      "slides": [
+        {"image": "ad_humanity.png", "lines": ["HUMANITY", "UPGRADED"], "jp": "より高く", "tint": [0.35, 0.70, 1.00], "layout": "bottom"},
+        {"image": "android-woman-cyberpunk.png", "lines": ["MORE THAN", "HUMAN"], "jp": "それ以上", "tint": [0.60, 0.40, 1.00], "layout": "bottom"}
+      ]
+    },
+    "RightA_0": {
+      "type": "ad", "size": [1024, 1920], "offset": 3.75,
+      "slides": [
+        {"image": "ad_samecity.png", "lines": ["SAME CITY.", "DIFFERENT YOU."], "jp": "同じ街、違う、あなた", "tint": [0.50, 0.75, 1.00], "layout": "bottom"},
+        {"image": "ad_nexus.png", "lines": ["NEXUS"], "jp": "新世界へ", "sub": "A BRIGHTER HUMAN TOMORROW", "tint": [0.40, 0.90, 1.00], "layout": "bottom"}
+      ]
+    },
+    "CenterLeft_0": {
+      "type": "ad", "size": [1024, 2048], "offset": 1.5,
+      "slides": [
+        {"image": "ad_kaze.png", "logo": "kaze", "lines": ["KAZE"], "jp": "かぜ", "sub": "A BRIGHTER HUMAN TOMORROW", "tint": [0.85, 0.92, 1.00], "layout": "logo"}
+      ]
+    },
+    "CenterRight_0": {
+      "type": "ad", "size": [1792, 1024], "offset": 2.0,
+      "slides": [
+        {"image": "ad_daisenka.png", "lines": ["DAISENKA"], "jp": "大深化", "tint": [1.00, 0.60, 0.20], "layout": "left"}
+      ]
+    },
+    "RightC_0": {
+      "type": "ad", "size": [1700, 1024], "offset": 5.0,
+      "slides": [
+        {"image": "ad_people.png", "lines": ["PEOPLE.", "A HIGHER TOMORROW."], "tint": [1.00, 0.75, 0.30], "layout": "top"}
+      ]
+    },
+    "LeftB_0": {"type": "neon", "size": [384, 2048], "columns": ["生き続ける"], "color": [0.30, 1.00, 0.85], "offset": 0.7},
+    "Center_0": {"type": "neon", "size": [280, 2048], "columns": ["新世界へ"], "color": [1.00, 0.30, 0.65], "offset": 2.3},
+    "Center_1": {"type": "neon", "size": [342, 2048], "columns": ["未来"], "latin": "MIRAI", "color": [0.30, 0.90, 1.00], "offset": 4.1},
+    "RightB_0": {"type": "neon", "size": [465, 2048], "columns": ["未来は、", "まだ書き換えられる"], "latin": "NEXUS", "frame": true, "color": [1.00, 0.15, 0.10], "offset": 5.9}
+  }
+}
