@@ -1,0 +1,7 @@
+Generation mode: built-in image_gen
+
+Use case: ads-marketing
+Asset type: finished landscape billboard artwork for DarkCityKiosk, 3:2 landscape aspect ratio, largest available resolution.
+Primary request: Product advertisement for a sleek futuristic neural-interface headset, matte black with a thin glowing amber light line, floating at an angle above a dark reflective surface, warm amber and orange rim light, deep black background, smoky haze. Product centred in the middle horizontal band, with the left third darker and emptier. Keep the top and bottom quarters plain, because the image will be cropped to a wider shape.
+Style: cinematic cyberpunk advertisement for a giant LED billboard on a skyscraper in a rainy megacity at night. Photorealistic, high contrast, soft holographic glow, subtle film grain, Blade Runner 2049 mood. Full-bleed image with no border or frame. Absolutely no text, letters, numbers, logos or watermarks anywhere in the image.
+Composition/framing: Keep the entire headset and essential glow inside the middle 50% of the image height so a wider center crop preserves the complete product. Maintain a dark empty left third; plain deep-black top and bottom quarters. Produce the full-bleed advertisement artwork itself, not a photograph of an installed billboard. No city architecture or billboard frame.

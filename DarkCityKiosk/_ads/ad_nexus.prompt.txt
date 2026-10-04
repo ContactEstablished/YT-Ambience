@@ -1,0 +1,7 @@
+Generation mode: built-in image_gen
+
+Use case: ads-marketing
+Asset type: finished portrait billboard artwork for DarkCityKiosk, 2:3 portrait aspect ratio, largest available resolution.
+Primary request: A human head-and-shoulders silhouette made entirely of thousands of tiny glowing particles and threads of light, dissolving upward into the air, against a deep black-blue void. Cyan and white light with a hint of warm gold at the core. Silhouette centred in the upper part of the frame, lower third dark. Margin on both sides (the image will be cropped taller).
+Style: cinematic cyberpunk advertisement for a giant LED billboard on a skyscraper in a rainy megacity at night. Photorealistic, high contrast, soft holographic glow, subtle film grain, Blade Runner 2049 mood. Full-bleed image with no border or frame. Absolutely no text, letters, numbers, logos or watermarks anywhere in the image.
+Composition/framing: the complete luminous head and shoulders occupy the upper two-thirds, centered horizontally with generous dark side margins for a narrower portrait crop. Lower third stays dark and empty. Produce the artwork itself, filling the canvas, rather than a photograph of an installed billboard or a city scene.

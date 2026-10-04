@@ -1,0 +1,98 @@
+{
+  "camera": {
+    "focalPx": 1496.92,
+    "horizontalFovDeg": 58.36,
+    "focalMm_fullFrame36": 32.23,
+    "focalMm_ueDefault23_76": 21.27,
+    "pitchUpDeg": 12.8,
+    "heightM": -0.07,
+    "distanceToCornerM": 10.64,
+    "frontFaceYawFromViewDeg": 35.8,
+    "leftFaceYawFromViewDeg": -54.2,
+    "horizonY": 810.68,
+    "vpFront": [
+      1942.95,
+      810.68
+    ],
+    "vpLeft": [
+      -1292.81,
+      810.68
+    ],
+    "vpLeftRaw": [
+      -1084.81,
+      768.65
+    ],
+    "vpPairsFront": [
+      [
+        1925.13,
+        808.01
+      ],
+      [
+        1936.85,
+        811.85
+      ],
+      [
+        1966.88,
+        812.19
+      ]
+    ]
+  },
+  "kiosk": {
+    "platformHeightM": 0.07,
+    "doorCentreFromCornerM": 1.8,
+    "leftFaceLengthM": 3.07,
+    "frontFaceLengthM": 4.27,
+    "serviceWindow": {
+      "fromCornerM": [
+        0.65,
+        1.99
+      ],
+      "topZ": 1.72
+    },
+    "counterLipZ_onWallPlane": 0.83,
+    "glazedWindow": {
+      "fromCornerM": [
+        2.74,
+        4
+      ],
+      "zRange": [
+        0.53,
+        1.55
+      ]
+    },
+    "canopyAtCorner_onWallPlane": {
+      "bottomZ": 2.43,
+      "topZ": 2.92
+    },
+    "canopyFrontEnd_onWallPlane": {
+      "along": 5.01,
+      "bottomZ": 2.34,
+      "topZ": 2.92
+    },
+    "canopyLeftEnd_onWallPlane": {
+      "along": 4.31,
+      "bottomZ": 2.51,
+      "topZ": 3
+    },
+    "roofTops_onFrontPlane": {
+      "tallestBox": 3.93,
+      "tanks": 3.69,
+      "mast": 4.36
+    },
+    "leftLanternZ": 1.68
+  },
+  "check": {
+    "doorBottomPx": [
+      473.01,
+      791.37
+    ],
+    "doorTopPx": [
+      486.64,
+      531.95
+    ],
+    "cornerBasePx": [
+      648.29,
+      789.45
+    ]
+  }
+}

@@ -1,0 +1,79 @@
+Create a large futuristic autonomous mass-transit craft for the distant background of my Unreal Engine megacity.
+
+This should feel like the equivalent of an airborne bus or city ferry.
+
+SIZE
+
+Approximately:
+
+Length: 12–20 meters
+Width: 4–6 meters
+
+It should look large enough to carry approximately 20–40 passengers.
+
+DESIGN
+
+Do NOT make this look like a conventional airplane.
+
+It should have:
+
+no wings
+no exposed engines
+no visible rotors
+
+Use a long rounded rectangular or slightly manta-shaped body.
+
+The exterior should be mostly dark and visually simple.
+
+The most important visual elements from a distance are:
+
+the silhouette
+a row of dim passenger windows
+small navigation lights
+one or two large underside levitation structures
+
+Consider using two very large recessed longitudinal levitation rails or four large glowing field apertures.
+
+The windows should emit a dim neutral warm-white or cool-white interior light.
+
+Avoid bright neon.
+
+The vehicle should often be partially obscured by fog.
+
+MOVEMENT
+
+This vehicle should feel extremely heavy.
+
+Acceleration should be slow.
+
+Turning radius should be large.
+
+Banking should be minimal.
+
+It should glide through the city almost like a ship moving through water.
+
+It should take several seconds to disappear behind a building or emerge from fog.
+
+This is primarily a background scale element.
+
+CREATE
+
+BP_AerialTransit
+
+Spline-based.
+
+Expose:
+
+CruiseSpeed
+Acceleration
+FogVisibilityFactor
+InteriorLightIntensity
+NavigationLightIntensity
+Altitude
+SplineOffset
+
+Add optional procedural interior window lighting so some windows are slightly dimmer than others.
+
+For distant versions, allow the vehicle to switch to an extremely simplified model/material setup.
+
+Please create a performant Unreal implementation intended for multiple background vehicles and long cinematic shots.

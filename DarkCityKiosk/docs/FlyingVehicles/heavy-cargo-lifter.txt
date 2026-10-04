@@ -1,0 +1,94 @@
+Design a futuristic heavy cargo lifter for a rainy Unreal Engine megacity.
+
+This vehicle should look industrial rather than luxurious.
+
+Its purpose is to transport containers, machinery, construction material, or supplies between high-rise buildings.
+
+SIZE
+
+Vehicle body:
+
+approximately 8–12 meters long.
+
+It should be capable of carrying a large suspended cargo container underneath.
+
+DESIGN
+
+Avoid military styling.
+
+The vehicle should have a broad, thick body with four large recessed levitation nodes located near the corners.
+
+These nodes may resemble circular cavities or deep elliptical apertures.
+
+Each contains a dim blue-white field generator.
+
+The vehicle itself should be nearly black:
+
+industrial graphite
+dark metal
+weathered ceramic
+rain-streaked surfaces
+
+Include practical details:
+
+cargo clamps
+sensor modules
+small maintenance markings
+small navigation lights
+structural reinforcement
+
+Do not add conventional wings or engines.
+
+CARGO
+
+Create optional cargo attachments:
+
+shipping container
+construction module
+equipment platform
+
+Cargo may either:
+
+attach directly underneath
+
+OR
+
+hang several meters below the craft using four cables.
+
+If cables are used, allow subtle secondary motion.
+
+MOVEMENT
+
+Cargo vehicles should move very slowly.
+
+The suspended cargo should lag behind slightly during turns.
+
+The craft should compensate for this motion.
+
+Movement should feel heavy enough that the viewer believes the object has significant mass.
+
+Create:
+
+BP_CargoLifter
+
+Optional:
+
+BP_CargoContainer
+
+Expose:
+
+VehicleSpeed
+CargoMassSimulation
+CableLength
+BankAngle
+Acceleration
+HoverVariation
+LiftGlowIntensity
+
+Consider using Chaos physics only where visually useful.
+
+Avoid unnecessary expensive physics if simple procedural sway can create the same effect.
+
+Add subtle rain/mist displacement beneath the four lift generators.
+
+Please describe the best Unreal implementation, including whether to use Physics Constraints or procedural Blueprint sway for the suspended cargo.

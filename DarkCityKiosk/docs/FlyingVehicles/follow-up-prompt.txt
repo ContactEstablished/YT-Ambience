@@ -1,0 +1,53 @@
+I now have several futuristic aerial vehicle Blueprints:
+
+BP_CourierDrone
+BP_AirTaxi
+BP_CommuterPod
+BP_AerialTransit
+BP_CargoLifter
+BP_HeroVehicle
+
+I want to build a convincing aerial traffic system for a cinematic Unreal Engine city.
+
+Do NOT build a complex game traffic simulation.
+
+This is primarily a looping environmental cinematic.
+
+Design a lightweight system using 3D splines that allows me to establish multiple invisible aerial traffic corridors at different elevations.
+
+Example layers:
+
+Low altitude:
+couriers and occasional commuter pods
+
+Medium altitude:
+air taxis and commuter pods
+
+High altitude:
+transit vehicles and cargo lifters
+
+Some routes should disappear behind buildings or into fog so vehicles can despawn invisibly.
+
+Vehicles should have randomized:
+
+spawn timing
+speed
+lane offset
+altitude offset
+vehicle variant
+light intensity
+
+Avoid obvious repeating patterns.
+
+Traffic should occasionally have intentional empty periods.
+
+The city should never look like every lane is continuously occupied.
+
+Create something like:
+
+BP_AerialTrafficManager
+BP_AerialTrafficSpline
+
+Explain the Unreal Blueprint architecture and give me an implementation plan.
+
+Prioritize performance, cinematic believability, and easy artistic control.

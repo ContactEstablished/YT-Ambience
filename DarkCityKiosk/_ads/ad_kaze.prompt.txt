@@ -1,0 +1,7 @@
+Generation mode: built-in image_gen
+
+Use case: ads-marketing
+Asset type: finished portrait billboard artwork for DarkCityKiosk, 2:3 portrait aspect ratio, largest available resolution.
+Primary request: Minimalist luxury brand advertisement: a pale figure seen from behind, standing with arms slightly open as long flowing ribbons of white and pale-blue light swirl around them like wind. Mostly dark charcoal background, clean and elegant, with plenty of empty space at the top and bottom. Centred; the image will be cropped to a tall 1:2 shape.
+Style: cinematic cyberpunk advertisement for a giant LED billboard on a skyscraper in a rainy megacity at night. Photorealistic, high contrast, soft holographic glow, subtle film grain, Blade Runner 2049 mood. Full-bleed image with no border or frame. Absolutely no text, letters, numbers, logos or watermarks anywhere in the image.
+Composition/framing: Keep the rear-view figure and essential ribbon curves within the central 75% of the width so a centered 1:2 crop preserves the subject. Leave generous dark empty space at both top and bottom. Produce the full-bleed artwork itself, not a photograph of an installed billboard. No city architecture, billboard frame, or typography.

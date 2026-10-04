@@ -1,0 +1,103 @@
+Create a visually memorable futuristic hero vehicle for my Unreal Engine cinematic city scene.
+
+This vehicle should appear only occasionally.
+
+It needs to make the viewer briefly wonder:
+
+"What was that?"
+
+The design should feel decades or centuries beyond ordinary vehicles while remaining elegant and believable.
+
+SIZE
+
+Approximately:
+
+Length: 6–8 meters
+Width: 3–4 meters
+
+DESIGN
+
+Create an extremely clean dark graphite body.
+
+The upper silhouette should resemble a smooth flattened teardrop or manta shape.
+
+Almost no visible seams.
+
+A narrow smoked-glass passenger canopy should be integrated into the body.
+
+The defining feature is the underside.
+
+Approximately 70% of the underside contains one enormous elliptical levitation aperture.
+
+The aperture should look almost like a hollow glowing ellipse embedded into the vehicle.
+
+The outer edge emits a soft blue-white/cyan light.
+
+The center remains completely dark.
+
+Do not make this resemble a jet engine.
+
+Do not show flames.
+
+Do not show thrust.
+
+Do not show spinning machinery.
+
+The propulsion mechanism should remain unexplained.
+
+MOVEMENT
+
+This vehicle should move much more slowly than expected.
+
+It should glide silently.
+
+The ideal cinematic event is:
+
+The vehicle begins hidden inside heavy fog between distant buildings.
+
+A faint pair of navigation lights appears first.
+
+The silhouette gradually emerges.
+
+The large underside field becomes visible.
+
+The vehicle crosses through a shaft of volumetric light.
+
+For approximately 1–2 seconds, rain running across the hull becomes visible.
+
+It passes behind the primary kiosk or elevated transit line.
+
+It then gradually disappears into fog.
+
+Total visible duration might be approximately 8–15 seconds.
+
+WEATHER EFFECT
+
+As it passes overhead or nearby, create an extremely subtle distortion of rain underneath the levitation aperture.
+
+Rain should curve outward from an invisible field.
+
+A faint mist ring may appear underneath.
+
+The effect should be visible mainly because nearby lights illuminate it.
+
+BLUEPRINT
+
+Create:
+
+BP_HeroVehicle
+
+Use a cinematic spline.
+
+Expose:
+
+TravelTime
+SpeedCurve
+BankCurve
+Visibility/Fog response
+Light intensity
+Rain displacement intensity
+
+Allow the entire appearance sequence to be triggered from Sequencer.
+
+Please design the Blueprint so the vehicle can be precisely choreographed with Unreal Sequencer while retaining procedural hover and secondary motion.

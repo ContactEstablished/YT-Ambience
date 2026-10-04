@@ -1,0 +1,133 @@
+Design and implement a futuristic autonomous air taxi for my Unreal Engine rainy cyberpunk city.
+
+This should look like transportation people living in this city use every day.
+
+It should NOT look like:
+
+a helicopter
+a quadcopter
+a fighter jet
+a Star Wars spaceship
+a flying modern automobile
+
+DIMENSIONS
+
+Approximately:
+
+Length: 4.5–6 meters
+Width: 2–2.5 meters
+Height: 1.5 meters
+
+DESIGN LANGUAGE
+
+Use a long, streamlined fuselage.
+
+The passenger compartment should have a large continuous smoked-glass canopy integrated smoothly into the body.
+
+The body should use:
+
+dark graphite ceramic
+brushed dark metal
+subtle carbon-like surfaces
+very limited pale metallic trim
+
+The craft should have no wings.
+
+The underside should contain two elongated levitation rails running approximately 60–70% of the vehicle's length.
+
+These rails should glow very softly cyan-white.
+
+From a distance, the vehicle should read primarily as:
+
+dark silhouette
+glass canopy
+two elegant luminous lines underneath
+
+Include very small red and white navigation lights.
+
+Do not cover the vehicle in glowing strips.
+
+MOVEMENT CHARACTER
+
+This vehicle should feel heavy.
+
+Think about a luxury automobile weighing several tons that somehow floats.
+
+It should:
+
+accelerate slowly
+decelerate smoothly
+bank slightly while turning
+rise and descend gently
+never twitch
+never abruptly rotate
+
+Introduce small inertial lag.
+
+When stopping:
+
+the craft should drift slightly forward
+correct backward
+settle into position
+
+Idle hovering should have extremely subtle movement.
+
+UNREAL IMPLEMENTATION
+
+Create a reusable Blueprint:
+
+BP_AirTaxi
+
+It should follow Unreal splines representing aerial traffic lanes.
+
+Expose:
+
+CruisingSpeed
+Acceleration
+BrakingDistance
+BankAngle
+BankResponse
+AltitudeOffset
+HoverVariation
+LightIntensity
+PassengerInteriorEnabled
+
+Allow different taxi instances to randomly vary:
+
+speed +/- 10%
+altitude +/- 1–3 meters
+spacing
+body material
+window brightness
+
+TRAFFIC
+
+Support multiple taxis following the same spline without visibly intersecting.
+
+Create simple spacing logic so taxis maintain a minimum distance.
+
+Do not build an expensive traffic simulation.
+
+A lightweight cinematic illusion is sufficient.
+
+WEATHER INTERACTION
+
+When the taxi passes through heavy rain:
+
+allow subtle mist displacement beneath the levitation rails.
+
+When it crosses a strong volumetric light shaft:
+
+its wet upper surface should briefly become visible.
+
+The body should otherwise partially disappear into the city haze.
+
+Please provide:
+
+Blueprint architecture
+Spline movement logic
+Material recommendations
+Niagara recommendations
+Traffic spacing system
+LOD/performance strategy
+Suggested exposed Blueprint parameters

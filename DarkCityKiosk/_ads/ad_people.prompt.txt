@@ -1,0 +1,11 @@
+Generation mode: built-in image_gen
+
+Initial prompt:
+Use case: ads-marketing
+Asset type: finished landscape billboard artwork for DarkCityKiosk, 3:2 landscape aspect ratio, largest available resolution.
+Primary request: Wide cinematic shot of a crowd of silhouetted people on a rooftop, looking up at a vast warm amber sunrise glowing through layers of haze between distant skyscrapers, hopeful mood, golden light rays. Main content in the middle horizontal band (the image will be cropped wider); the upper sky stays simple and uncluttered.
+Style: cinematic cyberpunk advertisement for a giant LED billboard on a skyscraper in a rainy megacity at night. Photorealistic, high contrast, soft holographic glow, subtle film grain, Blade Runner 2049 mood. Full-bleed image with no border or frame. Absolutely no text, letters, numbers, logos or watermarks anywhere in the image.
+Composition/framing: Produce the full-bleed advertisement artwork itself. Keep the crowd's silhouettes, glowing sunrise and essential distant skyline in the middle horizontal band so a wider center crop preserves the scene. Simple uncluttered upper sky; lower foreground unobtrusive. The depicted scene is an amber sunrise; the rainy nighttime megacity is the intended display setting. Do not depict an installed billboard, billboard frame or surrounding display hardware.
+
+Final composition refinement:
+Edit this image with one targeted composition change: raise the entire rooftop crowd into the middle horizontal band to survive a much wider center crop. Keep the existing amber sunrise, hazy futuristic skyline, photorealism, hopeful mood, subtle film grain and full-bleed 3:2 landscape canvas. Put ALL people's heads between 43% and 55% of the image height and their visible body silhouettes between 50% and 72%. The people should remain a crowd seen from behind looking upward toward the warm amber sunrise; use a slightly more distant wide shot. Extend the plain dark wet rooftop foreground below them to fill the lower 28%, so cropping off the lower quarter does not remove the crowd. The upper sky stays simple and uncluttered. Preserve the skyline and sun in the middle horizontal band. No text, letters, numbers, logos, watermarks, borders, frames or billboard hardware anywhere.

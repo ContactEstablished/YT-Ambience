@@ -1,0 +1,105 @@
+I want to replace the conventional quadcopter currently flying through my Unreal Engine futuristic city scene with a much more advanced autonomous courier drone.
+
+DESIGN
+
+Create a compact futuristic courier vehicle approximately 1.0–1.5 meters wide.
+
+The silhouette should resemble a flattened diamond, manta ray, or rounded geometric disc rather than a conventional drone.
+
+The body should be extremely clean and compact:
+
+- no exposed propellers
+- no rotor arms
+- no landing helicopter-style skids
+- no visible conventional jet engine
+- no military appearance
+
+Use a dark graphite or black ceramic upper shell.
+
+The underside should contain one recessed oval or circular levitation ring approximately 60–70% the width of the craft.
+
+The levitation ring emits a soft pale cyan-white glow.
+
+The center of the underside should remain dark.
+
+Add:
+
+- one very small forward sensor aperture
+- two tiny red navigation lights
+- subtle panel seams
+- perhaps two tiny articulated stabilization fins
+
+Avoid excessive surface detail.
+
+The design should remain readable even when the vehicle is only 20–50 pixels wide on screen.
+
+PROPULSION EFFECT
+
+The vehicle should appear to hover using an invisible field.
+
+Create a subtle Niagara effect where rain underneath the craft is pushed slightly outward.
+
+Do NOT create a visible rocket exhaust.
+
+Possible effects:
+
+- faint mist displacement
+- subtle circular air/rain disturbance
+- weak volumetric distortion
+- tiny droplets illuminated briefly by the lift ring
+
+These effects should be subtle enough that the viewer may not consciously notice them.
+
+MOVEMENT
+
+Create a reusable Blueprint actor called something similar to:
+
+BP_CourierDrone
+
+The drone should support movement along a spline.
+
+Expose variables for:
+
+Speed
+Acceleration
+HoverAmplitude
+HoverFrequency
+YawDrift
+LightIntensity
+RandomSeed
+
+Suggested behavior:
+
+Cruising speed: moderate-fast
+Hover oscillation: approximately +/- 4–8 cm
+Hover cycle: 3–6 seconds
+Yaw drift: approximately +/- 1–2 degrees
+Acceleration and braking should be smooth.
+
+When stopped, the drone should slightly overshoot its destination and softly stabilize rather than snapping into position.
+
+When turning, allow a slight banking motion.
+
+The vehicle should sometimes:
+
+slow down
+hover
+change altitude slightly
+resume flight
+
+Add randomized timing so multiple instances do not move identically.
+
+LIGHTING
+
+The cyan lift ring should softly illuminate nearby fog and rain but should not cast an unrealistically strong pool of light.
+
+This vehicle will often appear high above the street and should feel mysterious rather than visually dominant.
+
+Please give me:
+
+1. Recommended Unreal asset/Blueprint hierarchy.
+2. Blueprint logic or pseudocode.
+3. Niagara setup.
+4. Material setup.
+5. Suggested spline movement system.
+6. Performance recommendations for approximately 10–30 drones visible in the scene.

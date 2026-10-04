@@ -1,0 +1,80 @@
+Create a small futuristic autonomous commuter vehicle for Unreal Engine.
+
+This vehicle sits between a courier drone and a full air taxi.
+
+It should carry one or two passengers.
+
+Approximate size:
+
+Length: 2.5–3.5 meters
+Width: 1.5–2 meters
+
+DESIGN
+
+Use an asymmetric design so the viewer cannot immediately compare it to a modern automobile.
+
+One side contains the passenger cabin.
+
+The other side contains a large circular or oval levitation aperture.
+
+Imagine an elegant enclosed passenger pod attached beside a mysterious hollow propulsion ring.
+
+The large ring should NOT resemble a turbine.
+
+It should appear to generate some kind of electromagnetic or gravitational field.
+
+The inner edge of the ring has a very subtle pale cyan glow.
+
+Most of the ring interior remains dark.
+
+The passenger cabin should have heavily tinted curved glass.
+
+Materials:
+
+matte graphite
+dark titanium
+ceramic black
+smoked glass
+
+This craft should look expensive, quiet, and sophisticated.
+
+MOVEMENT
+
+Commuter pods should operate primarily between buildings.
+
+They should feel more maneuverable than larger taxis but not behave like drones.
+
+Suggested movement:
+
+medium speed
+smooth banking
+gentle elevation changes
+occasional short pauses near buildings
+
+They may occasionally rotate slightly in place while waiting for clearance.
+
+CREATE
+
+BP_CommuterPod
+
+Allow spline-based movement.
+
+Expose:
+
+Speed
+BankAngle
+HoverOffset
+StopDuration
+Acceleration
+TrafficLaneOffset
+RingGlowIntensity
+
+Include small random variations in the movement.
+
+One particularly useful behavior:
+
+Allow the vehicle to pause at an invisible "station point" near a building for 5–20 seconds before continuing along the spline.
+
+Make this cinematic rather than a full simulation.
+
+Please provide the Blueprint setup, suggested movement state machine, material setup, ring emissive material, optional rain interaction, and performance recommendations.
