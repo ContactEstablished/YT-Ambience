@@ -132,8 +132,7 @@ def tune_kiosk_materials():
             MEL.update_material_instance(mi)
             EAL.save_loaded_asset(mi)
     # Wet paint and steel read glossier
-    for name, rough in (("Kiosk_YellowPaint", 0.32), ("Kiosk_YellowPaint_Dark", 0.35), ("Steel_Dark", 0.3),
-                        ("Steel_Grey", 0.35), ("Steel_Galvanised", 0.3), ("Platform_Concrete", 0.45), ("Glass_Dirty", 0.1)):
+    for name, rough in S.KIOSK_ROUGHNESS.items():
         path = f"{folder}/{name}"
         if EAL.does_asset_exist(path):
             mi = unreal.load_asset(path)
@@ -249,16 +248,16 @@ cb = K.CANOPY_BOTTOM
 for i, (axis, fixed, a0, a1) in enumerate(K.SOFFIT_TUBES):
     tilt = math.radians(S.SOFFIT["tilt_to_wall_deg"])
     if axis == "X":  # front band: wall is at +Y (Blender) = -Y (Unreal)
-        pos, x_dir, y_dir = ((a0 + a1) / 2, fixed, cb - 0.08), (0, -math.sin(tilt), -math.cos(tilt)), (1, 0, 0)
+        pos, x_dir, y_dir = ((a0 + a1) / 2, fixed, K.SOFFIT_TUBE_Z - 0.04), (0, -math.sin(tilt), -math.cos(tilt)), (1, 0, 0)
     else:  # left band: wall is at +X
-        pos, x_dir, y_dir = (fixed, (a0 + a1) / 2, cb - 0.08), (math.sin(tilt), 0, -math.cos(tilt)), (0, 1, 0)
+        pos, x_dir, y_dir = (fixed, (a0 + a1) / 2, K.SOFFIT_TUBE_Z - 0.04), (math.sin(tilt), 0, -math.cos(tilt)), (0, 1, 0)
     rect_light(f"L_Soffit_{i}", pos, x_dir, y_dir, (a1 - a0) * 100, S.SOFFIT["height_cm"], S.SOFFIT["intensity_cd"],
                temperature=S.SOFFIT["temperature"])
 
 # Glow from the lit canopy faces onto the ground and rain
 sp = S.CANOPY_SPILL
 d = math.radians(sp["down_deg"])
-mid_z = (K.CANOPY_BOTTOM + K.CANOPY_TOP) / 2
+mid_z = (K.FACE_Z0 + K.FACE_Z1) / 2  # centre of the lit yellow face
 rect_light("L_CanopySpill_Front", ((K.CANOPY_X0 + K.CANOPY_X1) / 2, K.CANOPY_Y0 - 0.06, mid_z),
            (0, math.cos(d), -math.sin(d)), (1, 0, 0), (K.CANOPY_X1 - K.CANOPY_X0 - 0.2) * 100, 40,
            sp["intensity_cd"], color=sp["color"], radius_m=18)

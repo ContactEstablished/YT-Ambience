@@ -18,8 +18,8 @@ A seamless, looping 4K rain ambience built around the kiosk in `_reference/Prima
 | 1 | Grey-box kiosk in Blender, matched to the reference | done (Sat 10/3) |
 | 2 | Grey-box in Unreal: wet ground, rain, fog, placeholder lights and city, camera sweep, preview render | done (Sat 10/3): previews v1-v3 in Renders/ |
 | 2b | Mist look: "on again, off again" dense mist with fine rain (first pass: fog waves + patchy rain) | iterating with the user |
-| 3 | Kiosk detail modelling, all scripted (build_kiosk.py + kiosk/ modules): 1 shell+canopy, 2 openings+interior, 3 wall clutter+lanterns+signs, 4 roof machinery, 5 texture prep (vertex-colour edge/AO masks) | steps 1-4 done (10/3; step 4 not yet exported to Unreal); Unreal uses kiosk_detail.glb (dck.KIOSK_GLB) |
-| 4 | Kiosk surfacing: paint, wear, rust, grime, decals, wetness/drips; sign art | |
+| 3 | Kiosk detail modelling, all scripted (build_kiosk.py + kiosk/ modules): 1 shell+canopy, 2 openings+interior, 3 wall clutter+lanterns+signs, 4 roof machinery, 5 texture prep (vertex-colour edge/AO masks) | steps 1-5 done (10/3); then the 10/4 passes: massing, proportion, construction, utility, roof (brief 4: four roof clusters, see docs/KIOSK-SPEC.md); Unreal uses kiosk_detail.glb (dck.KIOSK_GLB) |
+| 4 | Kiosk surfacing: paint, wear, rust, grime, decals, wetness/drips; sign art | weathering done 10/4 (briefs 5 + 5B, locked); signage + decals done 10/5 (brief 6: posters, notices, labels, stickers, lit side signs, removed-sign residue; Graphics/ + build_graphics.py + kiosk_graphics.py, see docs/KIOSK-SPEC.md "Signage pass"); next: counter clutter, steam, animated drips |
 | 5 | City: towers, viaduct, bridges, ad screens with animated content, beacons | towers + landmark + procedural windows (v9); LED screens + neon (setup_screens); viaduct + train running into RightA once per loop (v10, 10/3); instanced city background in 4 depth bands + deeper MIRAI landmark + blue-gray far fog + night-sky cubemap sky light (10/3, setup_city_bg / atmosphere; preview_v18) |
 | 6 | Life: umbrella crowds, flying cars, train, steam, pulsing lights | six flying-vehicle types in altitude-layered air corridors with baked motion, per-variant schedules, a hero pass through a light shaft (10/4, preview_v22_traffic); flying cars (v12, 10/3); crowd: 16 walkers + 1 standing in scripted coats, hoods and hats, ~20% without umbrellas (v17, 10/3) |
 | 7 | Loop timing (5 min), seam crossfade, final 4K renders, encode, long-form assembly | |
@@ -47,6 +47,7 @@ blender -b --factory-startup -P build_kiosk_blockout.py -- --render   # .blend +
 blender -b ../kiosk_blockout.blend --factory-startup -P export_kiosk_glb.py   # grey box -> RawContent/kiosk_blockout.glb
 blender -b ../kiosk_detail.blend --factory-startup -P export_kiosk_glb.py     # detailed -> RawContent/kiosk_detail.glb (what Unreal uses)
 blender -b --factory-startup -P build_kiosk.py -- --render --tag d2   # detailed kiosk -> kiosk_detail.blend + review renders
+blender -b --factory-startup -P build_graphics.py                      # signage pass: cards/signs onto kiosk_detail.glb -> RawContent/kiosk_graphics.glb + graphics/kiosk_decals.json
 blender -b --factory-startup -P build_city.py -- --export              # city + viaduct -> RawContent/city.glb + city_manifest.json (city_config.py)
 blender -b --factory-startup -P build_train.py                           # train -> RawContent/train.glb
 blender -b --factory-startup -P build_flying_vehicles.py -- --render     # the six vehicle types + cargo container -> RawContent/flying_vehicles.glb (+ renders/veh_*.png)
@@ -54,16 +55,24 @@ blender -b --factory-startup -P build_umbrella.py -- --render            # umbre
 blender -b --factory-startup -P build_outfits.py -- --render             # coats, hoods, hats fitted to the bodies -> RawContent/outfits.glb
 ```
 
+Kiosk graphics art (from `DarkCityKiosk/`; Playwright is in package.json, `npm install` once):
+
+```
+node Graphics/make_kiosk_graphics.mjs [Paper,Labels,Signs,Decals] [--only name,...]   # atlases + graphics_manifest.json -> Unreal/RawContent/graphics/ (previews in Graphics/preview/)
+```
+
 Unreal (from `Unreal/`, with the editor open; in Git Bash run `export MSYS_NO_PATHCONV=1` first):
 
 ```
 node Scripts/ue.mjs Scripts/import_kiosk.py      # re-import the kiosk GLB in place
+node Scripts/ue.mjs Scripts/kiosk_refresh.py     # after a kiosk re-export: import + actors for new sections + material tuning + canopy-following lights
 node Scripts/ue.mjs Scripts/setup_scene.py       # ground, fog, lights, city, rain (scene_config.py)
 node Scripts/ue.mjs Scripts/ground.py            # just the street: concrete slabs + puddle height mask + EasyRain puddle settings
 node Scripts/ue.mjs Scripts/setup_city.py       # city meshes, window shader, screen/shop glow lights
 node Scripts/ue.mjs Scripts/setup_city_bg.py    # instanced city background (scene_config.CITY_BG); --show old|new to compare
 node Scripts/ue.mjs Scripts/atmosphere.py       # height fog + night-sky cubemap sky light (scene_config.FOG / SKY)
 node Scripts/ue.mjs Scripts/kiosk_look.py       # kiosk light levels, their fog glow, glowing materials (scene_config kiosk section)
+node Scripts/ue.mjs Scripts/kiosk_graphics.py   # signage: atlases, kiosk_graphics.glb, M_KioskGraphic/Decal/Lettering, decals, 24h light (--apply: numbers only; scene_config.GRAPHICS_LOOK)
 node Scripts/ue.mjs Scripts/setup_screens.py    # ad screens + neon signs (re-composes _ads/ art via make_screens.ps1)
 node Scripts/ue.mjs Scripts/setup_train.py      # train actor + its lights (after: blender build_train.py)
 "C:/Program Files/Blender Foundation/Blender 5.2/5.2/python/bin/python.exe" Scripts/traffic_plan.py --replan        # air corridors (offline, ~20 min) -> RawContent/traffic_routes.json; then setup_city_bg.py

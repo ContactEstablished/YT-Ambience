@@ -1,16 +1,21 @@
-"""Step 3: wall clutter, lanterns, posters/stickers and ground props.
+"""Step 3: wall clutter, lanterns and ground props.
 
 Electrical cluster (meter box with dial, breaker box with lamps, junction box, conduit with
-clamps, sagging cables), ribbed paper lanterns (chochin) with lettering, poster boards and
-scattered stickers, a downpipe, and the ground props: slatted crates, an equipment cabinet,
-the red bottle crate, bins with lids, the utility cabinet, cushioned stools and the railing.
+clamps, sagging cables), the ribbed paper lantern (chochin) by the door wall, the 24h sign's pole,
+a downpipe, and the ground props: slatted crates, an equipment cabinet, the red bottle crate, bins
+with lids, the utility cabinet, cushioned stools and the railing.
+
+Signage pass (2026-10-05): the placeholder poster boards and coloured sticker boxes are gone; the
+posters, notices, labels and stickers are textured cards from kiosk/graphics.py (build_graphics.py,
+exported on their own as kiosk_graphics.glb). The lantern lettering moved there too, and the round
+24h lantern became a narrow lightbox on the same pole (kiosk/graphics.py sign_24h).
 """
 import math
 
 import kiosk_config as C
-from . import geo, shell
+from . import geo, utilities
 
-X0, Y0, Y1, PH = C.X0, C.Y0, C.Y1, C.PLATFORM_H
+X0, X1, Y0, Y1, PH = C.X0, C.X1, C.Y0, C.Y1, C.PLATFORM_H
 BEAM_Z = C.BODY_TOP - C.SHELL["topbeam_h"]  # underside of the top beam
 
 MATERIALS = {
@@ -70,13 +75,19 @@ def electrical(m):
         geo.cylinder(m, (X0 - d / 2, yg, z0 - 0.015), 0.014, 0.03, "Rubber_Black", segments=10)
     geo.cable(m, (X0 - d / 2, a1 - 0.05, z0 - 0.03), (X0 - 0.35, a1 + 0.25, PH + 0.01), 0.05, 0.007, "Rubber_Black")
     conduit_up(m, X0 - 0.04, (a0 + a1) / 2, z1)
-    # small box on the front wall by the corner, wired across the corner post
-    geo.box(m, -2.05, -1.88, Y0 - 0.08, Y0, 1.75, 1.95, "Steel_Grey", 0.008, 2)
-    geo.cable(m, (-1.96, Y0 - 0.05, 1.95), (X0 - 0.06, -1.24, 1.75), 0.10, 0.006, "Rubber_Black")
-    # loose cables sagging from the breaker box and the front wall up to the soffit
-    geo.cable(m, (X0 - 0.07, -0.86, 2.20), (C.CANOPY_X0 + 0.35, C.CANOPY_Y0 + 0.35, C.CANOPY_BOTTOM - 0.02), 0.16, 0.008, "Rubber_Black")
-    geo.cable(m, (-1.2, Y0 - 0.04, BEAM_Z - 0.02), (0.2, Y0 - 0.04, BEAM_Z - 0.02), 0.22, 0.006, "Rubber_Black", 14)
-    geo.cable(m, (0.9, Y0 - 0.05, BEAM_Z - 0.02), (2.05, Y0 - 0.05, BEAM_Z - 0.05), 0.15, 0.006, "Rubber_Black", 12)
+    # small box on the front wall by the corner (above the ticket machine), wired across the
+    # corner post into the meter box
+    sx0, sx1, sz0, sz1 = X0 + 0.10, X0 + 0.27, 1.72, 1.92
+    meter = boxes["MeterBox"]
+    geo.box(m, sx0, sx1, Y0 - 0.08, Y0, sz0, sz1, "Steel_Grey", 0.008, 2)
+    geo.cable(m, ((sx0 + sx1) / 2, Y0 - 0.05, sz1), (X0 - 0.06, meter[1] + 0.16, sz0), 0.10, 0.006, "Rubber_Black")
+    # a loose cable sagging from the breaker box across the soffit into the sign circuit's corner box
+    # (utility pass: it used to end at a bare point in the canopy; the two cables that sagged along the
+    # front wall became the lightbox cable tied along the old conduit, utilities.front_wall)
+    fuse = boxes["FuseBox"]
+    cb, sx, sy, sz = utilities.fascia_boxes()["corner"]
+    geo.cable(m, (X0 - 0.07, (fuse[1] + fuse[2]) / 2, fuse[4]), (cb.x - 0.03, cb.y + sy / 2 - 0.005, cb.z - 0.015), 0.16, 0.008,
+              "Rubber_Black")
 
 
 # ---- Lanterns -----------------------------------------------------------------------------
@@ -132,46 +143,17 @@ def lanterns(m, B, coll):
     geo.pipe(m, (ll["x"], ll["y"], z), (ll["x"], ll["y"], bottom - 0.04), 0.02, "Steel_Dark", 10)
     geo.box(m, ll["x"] - 0.06, ll["x"] + 0.06, ll["y"] - 0.06, ll["y"] + 0.06, bottom - 0.045, bottom - 0.035, "Steel_Dark")
     chochin(m, ll["x"], ll["y"], ll["z"], ll["radius"], ll["h"])
-    geo.cable(m, (ll["x"], ll["y"], ll["z"] + ll["h"] / 2), (C.CANOPY_X0 + 0.2, ll["y"] - 0.2, C.CANOPY_BOTTOM - 0.02), 0.08, 0.006, "Rubber_Black", 8)
-    lantern_text(m, B, coll, "ラ\n｜\nメ\nン", ll["x"], ll["y"], ll["z"] + 0.01, ll["radius"], ll["h"], 0.095)
+    lb, _, _, lbz = utilities.fascia_boxes()["lantern"]  # its feed hangs from the sign circuit's lantern box
+    geo.cable(m, (ll["x"], ll["y"], ll["z"] + ll["h"] / 2), (lb.x, lb.y, lb.z - lbz / 2 + 0.005), 0.06, 0.006, "Rubber_Black", 8)
+    # its lettering is in kiosk/graphics.py now (lantern_lettering), with the signage pass's ink
 
+    # the 24h sign's pole: the sign itself (a narrow lightbox) is in kiosk/graphics.py. The utility
+    # pass feeds it through the cap on top (utilities.py "lantern_r_feed"), so the pole stays put.
     lr = C.LANTERN_R
     top = lr["z"] + lr["h"] / 2
     px = lr["x"] + 0.12
     geo.pipe(m, (px, lr["y"], PH), (px, lr["y"], top + 0.16), 0.02, "Steel_Dark", 10)
     geo.box(m, px - 0.08, px + 0.08, lr["y"] - 0.08, lr["y"] + 0.08, PH, PH + 0.01, "Steel_Dark", 0.003)
-    geo.pipe(m, (px, lr["y"], top + 0.14), (lr["x"], lr["y"], top + 0.14), 0.012, "Steel_Dark", 8)
-    geo.pipe(m, (lr["x"], lr["y"], top + 0.14), (lr["x"], lr["y"], top + 0.02), 0.004, "Steel_Dark", 6)
-    chochin(m, lr["x"], lr["y"], lr["z"], lr["radius"], lr["h"])
-    lantern_text(m, B, coll, "24\n時\n間\n営\n業", lr["x"], lr["y"], lr["z"], lr["radius"], lr["h"], 0.075)
-
-
-# ---- Posters and stickers -------------------------------------------------------------------
-
-STICKER_MATS = ["Stock_Red", "Stock_White", "Stock_Yellow", "Stock_Blue", "Stock_Green", "Paper_White", "Poster_Colour"]
-
-
-def posters_and_stickers(m):
-    walls = shell.WALLS
-    for name, a0, a1, z0, z1 in C.LEFT_WALL_DECALS:
-        shell.wall_box(m, walls["left"], a0, a1, z0, z1, 0.004, 0.008, "Logo_Stencil" if "Logo" in name else "Poster_Colour",
-                       0.0, 1, geo.jitter(1.5))
-    for name, a0, a1, z0, z1 in C.FRONT_WALL_DECALS:
-        shell.wall_box(m, walls["front"], a0, a1, z0, z1, 0.004, 0.008, "Poster_Colour", 0.0, 1, geo.jitter(1.5))
-    # stickers: (wall, u range, z range, count)
-    zones = [("left", (-1.48, -0.30), (0.30, 0.72), 7), ("left", (-1.05, -0.30), (1.20, 1.80), 4),
-             ("front", (-2.08, -1.88), (0.50, 1.70), 5),
-             ("front", (-0.12, 0.56), (0.25, 1.95), 8), ("front", (1.90, 2.08), (0.40, 2.10), 4),
-             ("left", (0.75, 1.45), (0.35, 1.90), 5)]
-    joints = {"front": [-1.045, 0.0, 1.045], "left": [-0.497, 0.497]}
-    for wall, (u0, u1), (z0, z1), n in zones:
-        for _ in range(n):
-            w, h = geo.RNG.uniform(0.04, 0.13), geo.RNG.uniform(0.04, 0.11)
-            u, z = geo.RNG.uniform(u0, u1 - w), geo.RNG.uniform(z0, z1 - h)
-            on_batten = any(abs(u + w / 2 - j) < C.SHELL["batten_w"] / 2 + w / 2 for j in joints[wall])
-            wbase = C.SHELL["batten_t"] if on_batten else 0.004
-            shell.wall_box(m, walls[wall], u, u + w, z, z + h, wbase, wbase + 0.002, geo.RNG.choice(STICKER_MATS),
-                           0.0, 1, geo.jitter(12.0))
 
 
 def downpipe(m):
@@ -284,8 +266,8 @@ def ground_props(m):
     for sx, sy in C.STOOLS:
         stool(m, sx, sy)
     railing(m)
-    geo.box(m, -2.95, -2.55, 2.25, 2.5, PH, PH + 0.18, "Cardboard", 0.006, rot=None)  # flattened boxes
-    geo.box(m, -3.0, -2.62, 2.2, 2.48, PH + 0.18, PH + 0.3, "Cardboard", 0.006)
+    geo.box(m, X0 - 0.80, X0 - 0.40, Y1 + 0.70, Y1 + 0.95, PH, PH + 0.18, "Cardboard", 0.006, rot=None)  # flattened boxes
+    geo.box(m, X0 - 0.85, X0 - 0.47, Y1 + 0.65, Y1 + 0.93, PH + 0.18, PH + 0.3, "Cardboard", 0.006)
 
 
 def build(coll, materials, B):
@@ -293,7 +275,6 @@ def build(coll, materials, B):
     m = geo.Mesh("Clutter_Detail")
     electrical(m)
     lanterns(m, B, coll)
-    posters_and_stickers(m)
     downpipe(m)
     ground_props(m)
     return m.build(coll, materials)

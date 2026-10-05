@@ -22,6 +22,7 @@ LIGHTS = {  # label prefix -> intensity (cd)
     "L_Soffit_": S.SOFFIT["intensity_cd"],
     "L_CanopySpill_": S.CANOPY_SPILL["intensity_cd"],
     "L_Interior": S.INTERIOR["intensity_cd"],
+    "L_Lantern_R": S.SIGN_24H_LIGHT["intensity_cd"],  # lights the 24h lightbox since the signage pass (10/5)
     "L_Lantern_": S.LANTERN_LIGHT["intensity_cd"],
     "L_WindowLightbox": S.WINDOW_LIGHTBOX_LIGHT["intensity_cd"],
     "L_CornerSign": S.CORNER_SIGN_LIGHT["intensity_cd"],
@@ -52,5 +53,11 @@ for name, strength in S.EMISSIVE.items():
         MEL.update_material_instance(mi)
         dck.EAL.save_loaded_asset(mi)
         m += 1
+    weathered = f"{dck.GAME}/Kiosk/Weather/Instances/MI_KW_{name}"  # surfacing pass: the instance on the actors
+    if dck.EAL.does_asset_exist(weathered):
+        mi = unreal.load_asset(weathered)
+        MEL.set_material_instance_scalar_parameter_value(mi, "EmissiveStrength", strength)
+        MEL.update_material_instance(mi)
+        dck.EAL.save_loaded_asset(mi)
 dck.LEVELS.save_current_level()
 print(f"kiosk_look: {n} kiosk lights (x{S.LIGHT_SCALE}, fog glow {S.KIOSK_LIGHT_VOLUMETRIC}), {m} glowing materials")

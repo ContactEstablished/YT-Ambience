@@ -49,7 +49,8 @@ LIGHT_SCALE = 1.0  # multiplies every kiosk light below
 KIOSK_LIGHT_VOLUMETRIC = 0.55  # how much the kiosk lights glow in the fog (the halo round the kiosk)
 SOFFIT = {"intensity_cd": 8, "temperature": 3100, "tilt_to_wall_deg": 35, "height_cm": 6}
 CANOPY_SPILL = {"intensity_cd": 28, "color": (1.0, 0.62, 0.18), "down_deg": 25}
-INTERIOR = {"pos": (-0.82, -1.00, 1.72), "intensity_cd": 20, "temperature": 2800, "radius_m": 4}
+INTERIOR = {"pos": (-1.075, -1.15, 1.67),  # in the service window (moved 10/4 with the wider kiosk)
+             "intensity_cd": 20, "temperature": 2800, "radius_m": 4}
 LANTERN_LIGHT = {"intensity_cd": 6, "temperature": 2300, "radius_m": 6}
 WINDOW_LIGHTBOX_LIGHT = {"intensity_cd": 7, "temperature": 5200}
 CORNER_SIGN_LIGHT = {"intensity_cd": 5, "color": (1.0, 0.8, 0.3), "radius_m": 4}
@@ -60,7 +61,7 @@ EMISSIVE = {
     "Lightbox_Yellow": 2.8,
     "Lightbox_White": 4.0,
     "Tube_WarmWhite": 14.0,
-    "Lantern_Paper": 5.0,
+    "Lantern_Paper": 2.3,  # signage pass (10/5): warm paper, a bright secondary sign under the fascia (was 5.0, read white; 3.2 still near white)
     "Interior_Light": 10.0,
     "Interior_Warm": 1.5,
     "Glass_Lit": 1.8,
@@ -73,7 +74,99 @@ EMISSIVE = {
 # Colour overrides (emissive + base colour) for glowing parts: saturated yellow-orange like the reference
 EMISSIVE_COLOR = {
     "Lightbox_Yellow": (1.0, 0.60, 0.07),
+    "Lantern_Paper": (1.0, 0.50, 0.11),  # signage pass (10/5): warm paper like the reference lantern (was the glTF's pale cream)
 }
+# Wet paint and steel read glossier (RoughnessFactor on the kiosk's glTF material instances)
+KIOSK_ROUGHNESS = {"Kiosk_YellowPaint": 0.32, "Kiosk_YellowPaint_Dark": 0.35, "Steel_Dark": 0.3, "Steel_Grey": 0.35,
+                   "Steel_Galvanised": 0.3, "Platform_Concrete": 0.45, "Glass_Dirty": 0.1,
+                   # construction pass (2026-10-04): duller layers that separate from the main paint
+                   "Kiosk_YellowPaint_Faded": 0.45, "Steel_Charcoal": 0.45, "Steel_Galv_Dull": 0.5,
+                   # utility pass (2026-10-04): conduit, cable, hose, copper, lagging, cast drain pipe
+                   "Conduit_Painted": 0.42, "Cable_Black": 0.5, "Hose_Grey": 0.7, "Copper_Aged": 0.42,
+                   "Insulation_Black": 0.85, "Pipe_Cast": 0.55,
+                   # roof pass (2026-10-04): the oldest roof pieces (warm aged metal) and the HVAC housing
+                   "Steel_Aged_Warm": 0.5, "Paint_Grey_Faded": 0.55}
+
+# ---- Kiosk weathering (surfacing pass, 2026-10-04) ----------------------------------------------
+# kiosk_weather.py builds M_KioskWeathered and one MI_KW_<material> per weathered glTF material, and
+# sets them on the kiosk actors' slots. The baked masks (Blender kiosk/weather.py) say WHERE wear,
+# rust, grime, streaks, soot, grease, splash and polish physically go; these numbers say HOW MUCH
+# each material shows, so every material (and so every roof unit) has its own history.
+# A material = a category preset + overrides. PaintColor defaults to the glTF instance's colour;
+# the amber / faded / newer-repaint generations are derived from it unless given. Colours linear.
+WEATHER_COMMON = {
+    "PrimerColor": (0.11, 0.065, 0.04), "RustDark": (0.065, 0.028, 0.012), "RustOrange": (0.22, 0.08, 0.022),
+    "RustBlack": (0.02, 0.013, 0.009), "GrimeColor": (0.042, 0.034, 0.024), "MudColor": (0.10, 0.088, 0.07),
+    "StreakColor": (0.045, 0.036, 0.025), "GreaseColor": (0.085, 0.048, 0.016), "SootColor": (0.014, 0.013, 0.012),
+    "EdgeWear": 0.0, "RustAmount": 0.0, "GrimeAmount": 0.0, "StreakAmount": 0.0, "StreakRustAmount": 0.0,
+    "SootAmount": 1.0, "GreaseAmount": 1.0, "TouchAmount": 1.0, "SplashAmount": 0.0, "WetAmount": 1.0,
+    "PaintVar": 0.0, "PrimerAmount": 0.0, "ScratchAmount": 0.0, "BaseRough": 0.5, "NewRough": 0.35,
+    "BareRough": 0.42, "Metallic": 0.0, "BareMetallic": 0.6, "BareColor": (0.05, 0.047, 0.043),
+    "EmissiveStrength": 0.0,
+    # brief 5B layers, driven by the fourth mask (zero outside the refined zones, so these are safe
+    # defaults): dried spatter, sun fade (to ChalkColor, derived per material), zinc white rust,
+    # light scuffs; EmisAge lets the lit diffuser's panel ages tint and dim its glow
+    "SpeckAmount": 1.0, "FadeAmount": 1.0, "FadedRough": 0.25, "OxideAmount": 1.0, "ScuffAmount": 1.0, "EmisAge": 0.0,
+    "OxideColor": (0.30, 0.30, 0.285),
+}
+WEATHER_CATEGORIES = {
+    # the kiosk's yellow sheets: generations of the same paint over dark steel
+    "yellow": {"EdgeWear": 1.0, "RustAmount": 0.85, "GrimeAmount": 0.7, "StreakAmount": 1.25, "StreakRustAmount": 0.9,
+               "SplashAmount": 0.6, "PaintVar": 1.0, "PrimerAmount": 0.6, "ScratchAmount": 0.8,
+               "BaseRough": 0.42, "NewRough": 0.28},
+    # dark painted structure: softened black paint, worn to steel at corners; streaks dry lighter
+    "dark_paint": {"EdgeWear": 1.15, "RustAmount": 0.8, "GrimeAmount": 0.6, "StreakAmount": 0.85, "StreakRustAmount": 0.75,
+                   "SplashAmount": 0.8, "PaintVar": 0.5, "PrimerAmount": 0.3, "ScratchAmount": 0.8,
+                   # on black paint, dried runs and dust read lighter than the paint
+                   "StreakColor": (0.17, 0.155, 0.13), "GrimeColor": (0.065, 0.057, 0.045), "MudColor": (0.16, 0.14, 0.11),
+                   "BareColor": (0.21, 0.2, 0.19),
+                   "BaseRough": 0.46, "NewRough": 0.32, "Metallic": 0.3, "BareMetallic": 0.75},
+    # other painted metal (greys, charcoal, machine bodies)
+    "paint": {"EdgeWear": 0.8, "RustAmount": 0.7, "GrimeAmount": 0.75, "StreakAmount": 0.85, "StreakRustAmount": 0.7,
+              "SplashAmount": 0.7, "PaintVar": 0.3, "PrimerAmount": 0.4, "ScratchAmount": 0.6,
+              "BaseRough": 0.52, "NewRough": 0.36, "BareMetallic": 0.7, "BareColor": (0.10, 0.097, 0.092)},
+    # bare zinc: rubs brighter, stains dark, rusts only where the zinc is gone
+    "galv": {"EdgeWear": 0.5, "RustAmount": 0.45, "GrimeAmount": 0.8, "StreakAmount": 1.0, "StreakRustAmount": 0.5,
+             "SplashAmount": 0.7, "PaintVar": 0.4, "ScratchAmount": 0.6, "BaseRough": 0.5, "NewRough": 0.32,
+             "BareRough": 0.3, "BareMetallic": 0.9},
+    # old oxidised steel and cast iron: heavily stained
+    "aged": {"EdgeWear": 0.6, "RustAmount": 1.2, "GrimeAmount": 0.9, "StreakAmount": 1.0, "StreakRustAmount": 1.2,
+             "SplashAmount": 0.8, "PaintVar": 0.5, "ScratchAmount": 0.4, "BaseRough": 0.62, "NewRough": 0.5,
+             "BareMetallic": 0.5},
+    # the lit yellow sign faces: still the cleanest, brightest yellow; seams, joins, edges and runoff age
+    # 5B (was grime 0.65, streak 0.35, rust streak 0.12, paint var 0.12): ~20-30% more visible age,
+    # per-panel diffuser age (EmisAge) and the runs from the roof, joints and rivets. The sign sits on
+    # the tonemapper's shoulder, so its dirt has to dim the glow quite a lot to read on screen.
+    "lightbox": {"GrimeAmount": 0.9, "StreakAmount": 1.0, "StreakRustAmount": 0.8, "SootAmount": 0.25, "GreaseAmount": 0.1,
+                 "TouchAmount": 0.0, "WetAmount": 0.3, "PaintVar": 0.5, "BaseRough": 0.5, "NewRough": 0.5, "EmisAge": 1.0},
+    # the platform slab: dirt, splash, rust stains from the drain and fixings
+    "concrete": {"EdgeWear": 0.25, "RustAmount": 0.6, "GrimeAmount": 1.0, "StreakAmount": 0.5, "StreakRustAmount": 0.6,
+                 "SplashAmount": 0.6, "PaintVar": 0.5, "BaseRough": 0.7, "NewRough": 0.7, "BareRough": 0.8,
+                 "BareMetallic": 0.0, "BareColor": (0.21, 0.205, 0.195), "TouchAmount": 0.0},
+}
+KIOSK_WEATHER = {
+    "Kiosk_YellowPaint": ("yellow", {}),
+    "Kiosk_YellowPaint_Dark": ("yellow", {"EdgeWear": 1.15, "RustAmount": 1.0}),  # the older sheets
+    "Kiosk_YellowPaint_Faded": ("yellow", {"GrimeAmount": 0.8, "BaseRough": 0.55}),
+    "Steel_Dark": ("dark_paint", {}),
+    "Conduit_Painted": ("dark_paint", {"EdgeWear": 0.6, "RustAmount": 0.5}),
+    "Steel_Charcoal": ("paint", {"EdgeWear": 0.55, "RustAmount": 0.35, "StreakAmount": 0.6, "BaseRough": 0.5}),  # newer retrofit housings
+    "Steel_Grey": ("paint", {}),
+    "Paint_Grey_Faded": ("paint", {"EdgeWear": 1.0, "RustAmount": 0.9, "StreakAmount": 1.0, "BaseRough": 0.6}),  # HVAC: old, sun-faded
+    "Machine_Body": ("paint", {"EdgeWear": 0.7, "RustAmount": 0.5}),
+    "Steel_Galvanised": ("galv", {}),
+    "Steel_Galv_Dull": ("galv", {"RustAmount": 0.7, "StreakAmount": 1.15, "GrimeAmount": 0.95}),  # oxidised zinc, more stained
+    "Steel_Aged_Warm": ("aged", {"BareColor": (0.20, 0.185, 0.17)}),  # 5B: scuffs and chips show lighter steel
+    "Rust_Red": ("aged", {"RustAmount": 0.9}),
+    "Pipe_Cast": ("aged", {"RustAmount": 1.0, "StreakRustAmount": 1.3}),
+    "Copper_Aged": ("galv", {"RustAmount": 0.0, "StreakRustAmount": 0.0, "BareColor": (0.5, 0.26, 0.15)}),
+    "Lightbox_Yellow": ("lightbox", {}),
+    "Platform_Concrete": ("concrete", {}),
+}
+# Plain (unweathered) slots aged on one section only, as children of the glTF instance (5B):
+# section -> {slot: glTF parameters}. The roof reel's hose: sun-chalked, dusty rubber (the same
+# rubber elsewhere on the kiosk stays black).
+KIOSK_SLOT_AGED = {"Roof": {"Rubber_Black": {"BaseColorFactor": (0.042, 0.040, 0.037), "RoughnessFactor": 0.9}}}
 
 # ---- Rain (BP_EasyRain) --------------------------------------------------------
 # Fine, slow, snow-like mist drops (user's look: like the reference clip; mostly visible where lit).
@@ -412,7 +505,7 @@ CROWD = {
     "turns_deg": (0, 0, -35, 35, -70, 70, -90, 90),
     "leg_max_m": 35, "max_radius_m": 70, "corner_radius_m": 2.5,
     "tower_pad_m": 1.0, "pier_pad_m": 0.5,
-    "kiosk_zone": (-3.6, 3.4, -3.4, 2.9),  # kiosk, platform, stools, props
+    "kiosk_zone": (-4.1, 3.9, -3.55, 3.05),  # kiosk, platform, stools, props (10/4: was (-3.6, 3.4, -3.4, 2.9))
     "camera_keepout_m": 3.5,  # nobody walks into the lens
     "heights_m": (0.3, 1.0, 1.75, 2.15),  # feet, body, head, umbrella top: hidden = all hidden
     "frame_margin": 0.04,
@@ -460,3 +553,40 @@ CROWD_LOOK = {
     "skirt_weights": {"thigh_at_hem": 0.85, "curve": 1.2, "side_blend_cm": 9.0},
     "led_emissive": 12.0, "led_light_cd": 40, "led_light_radius_m": 4,
 }
+
+# ---- Kiosk graphics (signage pass, 2026-10-05, brief 6) -----------------------------------------
+# kiosk_graphics.py builds M_KioskGraphic (the cards), M_KioskDecal (marks in the paint) and
+# M_KioskLettering (the aged fascia lettering) and applies these numbers. A card picks up the
+# weathering of the surface it is stuck to (the kiosk's masks through its UV1), scaled per texel by
+# its art's weather response (paper ~1, laminate/vinyl ~0.4, metal ~0.3) and by the amounts below.
+GRAPHICS_LOOK = {
+    "paper": {"GrimeAmount": 0.9, "StreakAmount": 0.9, "StreakRustAmount": 0.75, "SplashAmount": 0.85, "WetAmount": 0.8,
+              "SootAmount": 0.8, "GreaseAmount": 0.9, "SpeckAmount": 0.7, "TouchAmount": 0.8, "AgeTint": 0.45,
+              "EmissiveStrength": 0.0, "TileM": 0.0, "DetailScale": 40.0},
+    "colors": {"GrimeColor": (0.11, 0.09, 0.06), "StreakColor": (0.17, 0.14, 0.09), "RustStain": (0.33, 0.15, 0.05),
+               "MudColor": (0.19, 0.16, 0.12), "SootColor": (0.04, 0.035, 0.03), "GreaseColor": (0.27, 0.18, 0.07),
+               "EmissiveTint": (1.0, 1.0, 1.0)},
+    # material slot -> (atlas, overrides)
+    "slots": {
+        "KG_Paper": ("Paper", {}),
+        "KG_Labels": ("Labels", {"StreakAmount": 0.75, "GrimeAmount": 0.8}),
+        # lit faces: well under the fascia (Lightbox_Yellow 2.8 on (1, 0.6, 0.07)); the faces' own colours tint them
+        "KG_Signs": ("Signs", {"EmissiveStrength": 1.25, "StreakAmount": 0.6, "GrimeAmount": 0.6}),  # 1.9 read brighter than the fascia
+        "KG_SignFrame": ("Signs", {"TileM": 0.256}),
+    },
+    "lantern_ink": (0.025, 0.014, 0.008),
+    # decal tweaks per item: opacity, tint (multiplies the art)
+    "decals": {"ghost_poster": {"opacity": 0.9}, "ghost_dark": {"opacity": 0.9}},
+    # decal UV -> atlas: Unreal's decal U runs up the wall and V to the viewer's right here, so swap them and flip V
+    "decal_uv": {"SwapUV": 1.0, "FlipU": 0.0, "FlipV": 1.0},
+    "decal_order": ["ghost_poster", "ghost_dark", "holes_pair", "holes_row", "residue_a", "residue_b", "residue_c",
+                    "stencil_k07", "marker_dates", "marker_breaker"],
+    # the fascia lettering: faded vinyl, crazing that leaks the lightbox, the diffuser's streaks and dust
+    "lettering_on": True,
+    # (first try: dust 0.13, faded ink 0.045, leak 0.6 were invisible past a metre; still subtle, the fascia stays the cleanest sign)
+    "lettering": {"FadeOdds": 0.35, "CrackScale": 160.0, "StreakAmount": 1.0, "GrimeAmount": 0.8, "SpeckAmount": 0.8,
+                  "LeakStrength": 1.8, "InkColor": (0.012, 0.010, 0.009), "FadedInk": (0.10, 0.08, 0.075),
+                  "DustColor": (0.30, 0.26, 0.19), "LeakColor": (1.0, 0.6, 0.07)},
+}
+# The 24h lightbox's light (L_Lantern_R moved in front of it); dimmer than the fascia's spill
+SIGN_24H_LIGHT = {"intensity_cd": 5, "temperature": 3000}

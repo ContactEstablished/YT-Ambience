@@ -128,6 +128,64 @@ def rivets(mesh, points, normal, mat, radius=0.009):
         mesh.add_raw([p + rot @ (v * radius) for v in tv], tf, mat, smooth=True)
 
 
+_BOLT = None
+
+
+def _bolt_template():
+    """Hex bolt head on a round washer, unit radius (across the hex corners), along +Z."""
+    global _BOLT
+    if _BOLT is None:
+        bm = bmesh.new()
+        ret = bmesh.ops.create_cone(bm, cap_ends=True, cap_tris=False, segments=10, radius1=1.35, radius2=1.35, depth=0.14)
+        bmesh.ops.translate(bm, vec=(0, 0, 0.07), verts=ret["verts"])
+        ret = bmesh.ops.create_cone(bm, cap_ends=True, cap_tris=False, segments=6, radius1=1.0, radius2=1.0, depth=0.6)
+        bmesh.ops.translate(bm, vec=(0, 0, 0.14 + 0.3), verts=ret["verts"])
+        bm.verts.index_update()
+        _BOLT = ([v.co.copy() for v in bm.verts], [[v.index for v in f.verts] for f in bm.faces])
+        bm.free()
+    return _BOLT
+
+
+def bolts(mesh, points, normal, mat, radius=0.016):
+    """Hex bolt heads with washers at world points, facing `normal`; each hex turned at random."""
+    tv, tf = _bolt_template()
+    base = _NORMAL_ROT[normal]
+    for p in points:
+        rot = base @ Matrix.Rotation(RNG.uniform(0, math.pi / 3), 3, "Z")
+        p = Vector(p)
+        mesh.add_raw([p + rot @ (v * radius) for v in tv], tf, mat, smooth=False)
+
+
+def prism(mesh, outline, mat, smooth=False):
+    """Closed solid from two matching loops of world points (`outline` = (front_loop, back_loop)),
+    e.g. a gusset plate: the same polygon at two depths. Normals are made to point outward."""
+    front, back = outline
+    n = len(front)
+    bm = bmesh.new()
+    vf = [bm.verts.new(Vector(p)) for p in front]
+    vb = [bm.verts.new(Vector(p)) for p in back]
+    bm.faces.new(vf)
+    bm.faces.new(list(reversed(vb)))
+    for i in range(n):
+        j = (i + 1) % n
+        bm.faces.new((vf[j], vf[i], vb[i], vb[j]))
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+    mesh.add_bm(bm, mat, smooth)
+
+
+def ibeam(mesh, axis, fixed, a, b, z0, z1, mat, width=0.08, flange=0.012, web=0.012):
+    """I-section beam hanging between z0 (bottom flange) and z1 (top flange) along `axis`
+    ('X' or 'Y') from a to b, centred on `fixed` (the other horizontal coordinate)."""
+    def part(lo, hi, h0, h1):
+        if axis == "X":
+            box(mesh, a, b, fixed + lo, fixed + hi, h0, h1, mat, 0.002)
+        else:
+            box(mesh, fixed + lo, fixed + hi, a, b, h0, h1, mat, 0.002)
+    part(-width / 2, width / 2, z0, z0 + flange)
+    part(-web / 2, web / 2, z0 + flange, z1 - flange)
+    part(-width / 2, width / 2, z1 - flange, z1)
+
+
 # ---- Rectangles (wall layout) --------------------------------------------------------
 
 def subtract_rects(rect, holes, min_size=0.02):

@@ -99,27 +99,31 @@ def service_interior(m):
     zr = z0 + 0.55
     geo.pipe(m, (x0 + 0.1, back - 0.05, zr), (x1 - 0.1, back - 0.05, zr), 0.006, "Interior_Steel", 8)
     for k in range(5):
-        cx = x0 + 0.25 + k * 0.12
+        cx = x0 + 0.25 + k * (x1 - x0) * 0.089
         geo.pipe(m, (cx, back - 0.05, zr), (cx, back - 0.055, zr - 0.2), 0.004, "Interior_Steel", 6)
         geo.cylinder(m, (cx, back - 0.055, zr - 0.22), 0.03, 0.03, "Interior_Steel", segments=10)
-    # equipment on the worktop
+    # equipment on the worktop: coffee machine at the left end, the rest spread along the window
     wz = z0 + 0.03
-    geo.box(m, -1.42, -1.12, back - 0.33, back - 0.03, wz, wz + 0.40, "Interior_Steel", 0.012, 2)  # coffee machine
-    geo.box(m, -1.40, -1.14, back - 0.335, back - 0.32, wz + 0.22, wz + 0.36, "Rubber_Black", 0.004)
-    for sx in (-1.33, -1.23):
+    ux = lambda f: x0 + f * (x1 - x0)  # noqa: E731 (fraction of the way along the window)
+    geo.box(m, x0 + 0.08, x0 + 0.38, back - 0.33, back - 0.03, wz, wz + 0.40, "Interior_Steel", 0.012, 2)  # coffee machine
+    geo.box(m, x0 + 0.10, x0 + 0.36, back - 0.335, back - 0.32, wz + 0.22, wz + 0.36, "Rubber_Black", 0.004)
+    for sx in (x0 + 0.17, x0 + 0.27):
         geo.cylinder(m, (sx, back - 0.36, wz + 0.17), 0.012, 0.05, "Steel_Grey", segments=8)
-    geo.box(m, -1.05, -0.69, -1.15, -0.79, wz, wz + 0.07, "Rubber_Black", 0.008)  # burner
-    geo.cylinder(m, (-0.87, -0.97, wz + 0.07 + 0.14), 0.16, 0.28, "Interior_Steel", segments=24)  # ramen pot
-    geo.cylinder(m, (-0.87, -0.97, wz + 0.07 + 0.255), 0.148, 0.01, "Broth", segments=24)
-    geo.cylinder(m, (-0.52, -0.92, wz + 0.10), 0.12, 0.20, "Interior_Steel", segments=20)  # stock pot
-    geo.cylinder(m, (-0.30, -0.85, wz + 0.11), 0.09, 0.22, "Stock_White", segments=16)  # rice cooker
+    bx = ux(0.467)
+    geo.box(m, bx - 0.18, bx + 0.18, Y0 + 0.40, Y0 + 0.76, wz, wz + 0.07, "Rubber_Black", 0.008)  # burner
+    geo.cylinder(m, (bx, Y0 + 0.58, wz + 0.07 + 0.14), 0.16, 0.28, "Interior_Steel", segments=24)  # ramen pot
+    geo.cylinder(m, (bx, Y0 + 0.58, wz + 0.07 + 0.255), 0.148, 0.01, "Broth", segments=24)
+    geo.cylinder(m, (ux(0.726), Y0 + 0.63, wz + 0.10), 0.12, 0.20, "Interior_Steel", segments=20)  # stock pot
+    geo.cylinder(m, (ux(0.889), Y0 + 0.70, wz + 0.11), 0.09, 0.22, "Stock_White", segments=16)  # rice cooker
 
 
 def shutter_rails(m):
-    sw = C.SERVICE_WINDOW
-    for xa, xb in ((sw["x0"], sw["x0"] + 0.03), (sw["x1"] - 0.03, sw["x1"])):
-        geo.box(m, xa, xb, Y0 - 0.005, Y0 + 0.05, sw["z0"], sw["z1"], "Steel_Grey", 0.003)
-    geo.box(m, sw["x0"] + 0.02, sw["x1"] - 0.02, Y0 - 0.01, Y0 + 0.04, sw["z1"] - 0.045, sw["z1"], "Steel_Grey", 0.004)
+    """Guide rails on the faces of the reveal lining (massing.py) and a top bar under its head."""
+    sw, t = C.SERVICE_WINDOW, C.MASSING["service_reveal"]["t"]
+    x0, x1, z1 = sw["x0"] + t, sw["x1"] - t, sw["z1"] - t
+    for xa, xb in ((x0, x0 + 0.03), (x1 - 0.03, x1)):
+        geo.box(m, xa, xb, Y0 - 0.005, Y0 + 0.05, sw["z0"], z1, "Steel_Grey", 0.003)
+    geo.box(m, x0 + 0.02, x1 - 0.02, Y0 - 0.01, Y0 + 0.04, z1 - 0.045, z1, "Steel_Grey", 0.004)
 
 
 def outside_counter(m):
@@ -127,24 +131,30 @@ def outside_counter(m):
     y_front = Y0 - c["projection"]
     geo.box(m, c["x0"], c["x1"], y_front, Y0, c["z"] - c["thickness"], c["z"], "Steel_Galvanised", 0.004)
     geo.box(m, c["x0"], c["x1"], y_front - 0.004, y_front + 0.02, c["z"] - 0.07, c["z"], "Steel_Galvanised", 0.003)
-    for x in (c["x0"] + 0.2, (c["x0"] + c["x1"]) / 2, c["x1"] - 0.2):  # gussets: wall plate + diagonal strut
+    u = C.UNDER_COUNTER_SIGN
+    for x in (c["x0"] + 0.2, u["x0"] - 0.12, u["x1"] + 0.12, c["x1"] - 0.2):  # gussets either side of the sign
         geo.box(m, x - 0.012, x + 0.012, Y0 - 0.03, Y0, c["z"] - 0.38, c["z"] - c["thickness"], "Steel_Dark", 0.003)
         geo.pipe(m, (x, Y0 - 0.02, c["z"] - 0.36), (x, y_front + 0.04, c["z"] - c["thickness"] - 0.005), 0.012, "Steel_Dark")
     lx, ly = c["x1"] - 0.1, y_front + 0.07  # support leg with foot plate
     geo.pipe(m, (lx, ly, PH), (lx, ly, c["z"] - c["thickness"]), 0.022, "Steel_Dark", 12)
     geo.box(m, lx - 0.06, lx + 0.06, ly - 0.06, ly + 0.06, PH, PH + 0.008, "Steel_Dark", 0.002)
     # condiments: sauce bottles, soy, shichimi shakers, napkin box, chopstick pot
+    # (placed along the service window, so they spread with it)
     zt = c["z"]
-    for x, r, h, mat in ((-1.02, 0.028, 0.17, "Stock_Red"), (-0.96, 0.028, 0.16, "Stock_Red"), (-0.90, 0.03, 0.14, "Rubber_Black"),
-                         (-0.62, 0.018, 0.07, "Stock_Red"), (-0.58, 0.018, 0.07, "Stock_Yellow"), (-0.20, 0.03, 0.14, "Rubber_Black")):
+    sw = C.SERVICE_WINDOW
+    ux = lambda f: sw["x0"] + f * (sw["x1"] - sw["x0"])  # noqa: E731
+    for x, r, h, mat in ((ux(0.40) - 0.06, 0.028, 0.17, "Stock_Red"), (ux(0.40), 0.028, 0.16, "Stock_Red"),
+                         (ux(0.40) + 0.06, 0.03, 0.14, "Rubber_Black"), (ux(0.667) - 0.02, 0.018, 0.07, "Stock_Red"),
+                         (ux(0.667) + 0.02, 0.018, 0.07, "Stock_Yellow"), (ux(0.963), 0.03, 0.14, "Rubber_Black")):
         geo.cylinder(m, (x, Y0 - 0.2, zt + h / 2), r, h, mat, segments=12)
         geo.cylinder(m, (x, Y0 - 0.2, zt + h + 0.012), r * 0.55, 0.024, "Stock_White", segments=10)
-    geo.box(m, -0.80, -0.70, Y0 - 0.26, Y0 - 0.16, zt, zt + 0.12, "Interior_Steel", 0.006)
-    geo.cylinder(m, (-0.40, Y0 - 0.18, zt + 0.075), 0.04, 0.15, "Wood_Light", segments=14)
+    nx, cx = ux(0.556), ux(0.815)  # napkin box, chopstick pot
+    geo.box(m, nx - 0.05, nx + 0.05, Y0 - 0.26, Y0 - 0.16, zt, zt + 0.12, "Interior_Steel", 0.006)
+    geo.cylinder(m, (cx, Y0 - 0.18, zt + 0.075), 0.04, 0.15, "Wood_Light", segments=14)
     for k in range(6):
         a = k * math.pi / 3
-        geo.pipe(m, (-0.40 + 0.018 * math.cos(a), Y0 - 0.18 + 0.018 * math.sin(a), zt + 0.1),
-                 (-0.40 + 0.022 * math.cos(a), Y0 - 0.18 + 0.022 * math.sin(a), zt + 0.26), 0.003, "Wood_Light", 5)
+        geo.pipe(m, (cx + 0.018 * math.cos(a), Y0 - 0.18 + 0.018 * math.sin(a), zt + 0.1),
+                 (cx + 0.022 * math.cos(a), Y0 - 0.18 + 0.022 * math.sin(a), zt + 0.26), 0.003, "Wood_Light", 5)
 
 
 def ticket_machine(m):
@@ -201,18 +211,21 @@ def window_lightbox(m, B, coll):
             w["z0"] + 0.03, w["z1"] - 0.03, "Lightbox_White")
     for xb in (w["x0"] + 0.15, w["x1"] - 0.15):  # wall brackets
         geo.box(m, xb - 0.015, xb + 0.015, Y0 - w["depth"], Y0, w["z1"], w["z1"] + 0.05, "Steel_Dark", 0.003)
-    B.text("Text_WindowLightbox", "カフェ・ラーメン\nインプラント", 0.15,
+    B.text("Text_WindowLightbox", "カフェ・ラーメン\nインプラント", min(0.15, (w["z1"] - w["z0"]) * 0.34),
            ((w["x0"] + w["x1"]) / 2, Y0 - w["depth"] - 0.009, (w["z0"] + w["z1"]) / 2), (90, 0, 0), B.M["sign_text"], coll,
            font=B.JP_FONT)
 
 
 def vent_grille(m):
+    """Louvred grille set into the face of the base frame (massing pass), below the glazed window."""
     v = C.VENT_GRILLE
-    geo.box(m, v["x0"], v["x1"], Y0 - 0.02, Y0, v["z0"], v["z1"], "Steel_Dark", 0.004)
-    n = 7
+    yf = Y0 - C.MASSING["base_proud"]
+    z1 = min(v["z1"], PH + C.MASSING["base_h"] - C.MASSING["base_lip_h"] - 0.01)
+    geo.box(m, v["x0"], v["x1"], yf - 0.02, yf + 0.01, v["z0"], z1, "Steel_Dark", 0.004)
+    n = 6
     for k in range(n):
-        z = v["z0"] + 0.025 + k * (v["z1"] - v["z0"] - 0.05) / (n - 1)
-        geo.box(m, v["x0"] + 0.02, v["x1"] - 0.02, Y0 - 0.03, Y0 - 0.02, z - 0.008, z + 0.008, "Steel_Grey", 0.002,
+        z = v["z0"] + 0.025 + k * (z1 - v["z0"] - 0.05) / (n - 1)
+        geo.box(m, v["x0"] + 0.02, v["x1"] - 0.02, yf - 0.03, yf - 0.02, z - 0.008, z + 0.008, "Steel_Grey", 0.002,
                 rot=None)
 
 
@@ -286,7 +299,7 @@ def door(m):
     geo.pipe(m, (lx0 - 0.02, hy, hz), (lx0 - 0.058, hy, hz), 0.009, "Steel_Grey")
     geo.box(m, lx0 - 0.05, lx0, hy - 0.04, hy + 0.04, hz + 0.12, hz + 0.24, "Steel_Dark", 0.006, 2)
     geo.cylinder(m, (lx0 - 0.052, hy, hz + 0.18), 0.012, 0.006, "Steel_Grey", axis="X", segments=12)
-    for hzz in (PH + 0.3, PH + 1.0, PH + 1.75):
+    for hzz in (PH + 0.3, PH + 1.0, PH + 1.68):  # the strap hinges (construction.py) line up with these
         geo.cylinder(m, (X0 - 0.03, yb + 0.005, hzz), 0.018, 0.13, "Steel_Dark", segments=12)
     geo.box(m, lx0 - 0.06, lx0, yb - 0.32, yb - 0.04, top - 0.12, top - 0.05, "Steel_Dark", 0.008, 2)  # closer
     geo.pipe(m, (lx0 - 0.04, yb - 0.3, top - 0.085), (X0 - 0.045, yb + 0.03, top + 0.03), 0.008, "Steel_Dark")

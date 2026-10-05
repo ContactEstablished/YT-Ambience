@@ -2,6 +2,10 @@
 with booleans applied and sign text converted to geometry.
 
     blender -b ../kiosk_blockout.blend --factory-startup -P export_kiosk_glb.py
+    blender -b ../kiosk_detail.blend --factory-startup -P export_kiosk_glb.py [-- --no-weather]
+
+The detailed kiosk also gets its surfacing data: vertex-colour masks (kiosk/masks.py) and the
+weathering bake (kiosk/weather.py: WeatherUV + Unreal/RawContent/weather/T_KioskWear_*.png).
 
 Writes Unreal/RawContent/<blend name>.glb. The .blend on disk is not modified.
 All meshes keep the kiosk frame (origin = footprint centre at ground level), so every
@@ -61,6 +65,12 @@ if "kiosk_detail" in OUT:
     sys.path.insert(0, HERE)
     from kiosk import masks
     masks.bake_masks([o for o in bpy.data.objects if o.type == "MESH" and o.name.startswith("SM_Kiosk_")])
+    # Surfacing pass (2026-10-04): weathering masks + the WeatherUV channel (kiosk/weather.py).
+    # --no-weather skips it (the glTF then has no TEXCOORD_1 and Unreal's weathered materials go flat).
+    if "--no-weather" not in sys.argv:
+        import kiosk_config as C
+        from kiosk import weather
+        weather.build([bpy.data.objects[f"SM_Kiosk_{s}"] for s in C.WEATHER["sections"] if f"SM_Kiosk_{s}" in bpy.data.objects])
 
 os.makedirs(os.path.dirname(OUT), exist_ok=True)
 gltf_args = dict(filepath=OUT, export_format="GLB", use_selection=False, export_apply=True, export_yup=True,

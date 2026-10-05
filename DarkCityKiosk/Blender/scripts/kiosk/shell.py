@@ -4,8 +4,15 @@ service-window frame, and the concrete platform.
 Wall coordinates: u runs along the wall (front/back: +X, left/right: +Y), z is height,
 w is distance outward from the wall plane. The panels' outer faces sit on the wall plane,
 so everything the grey box attached to the walls still lines up.
+
+Construction pass (2026-10-04): the panels no longer follow an even grid. Joints come from
+kiosk_config.PANEL_JOINTS (uneven, with narrow fillers by the door), and each joint has its own
+treatment: a bare seam, a riveted batten, a lap (the next sheet overlaps), or a wide bolted
+reinforcement strip. Sheets are split at uneven heights, the upper sheet often lapping over the
+lower one, and some are replacement sheets in a different paint, standing a few mm proud.
 """
 import math
+import random
 
 from mathutils import Euler
 
@@ -35,6 +42,36 @@ def openings(name):
     return []
 
 
+def joint_plan(name):
+    """Panel joints along a wall, [(u, kind)]: PANEL_JOINTS if the wall is listed, else seeded
+    uneven widths (the walls the camera never sees squarely)."""
+    if name in C.PANEL_JOINTS:
+        return list(C.PANEL_JOINTS[name])
+    wall = WALLS[name]
+    u, u_end = wall["u"][0] + POST, wall["u"][1] - POST
+    rng = random.Random("panels-" + name)
+    out = []
+    while True:
+        u += rng.uniform(*C.PANEL_WIDTHS)
+        if u > u_end - 0.8 * C.PANEL_WIDTHS[0]:
+            return out
+        out.append((u, rng.choice(("seam", "batten", "lap", "seam", "batten", "strip"))))
+
+
+# Raised shell parts per wall, [(u0, u1, z0, z1, outer w)], filled in by build_wall. Parts laid on the
+# wall later (posters, stickers, plates) ask surface_w() how far out the shell stands under them.
+LAYOUT = {}
+
+
+def surface_w(name, u0, u1, z0, z1):
+    """Outermost w of the shell skin (sheets, battens, strips) under the rectangle."""
+    return max([p[4] for p in LAYOUT.get(name, []) if p[0] < u1 and p[1] > u0 and p[2] < z1 and p[3] > z0], default=0.0)
+
+
+def _clear(holes, u, z, margin=0.025):
+    return not any(h[0] - margin < u < h[1] + margin and h[2] - margin < z < h[3] + margin for h in holes)
+
+
 def world(wall, u, z, w):
     if wall["axis"] == "X":
         return (u, wall["fixed"] + wall["out"] * w, z)
@@ -50,8 +87,29 @@ def wall_box(mesh, wall, u0, u1, z0, z1, w0, w1, mat, bevel=0.0, segments=1, til
     geo.box(mesh, a[0], b[0], a[1], b[1], a[2], b[2], mat, bevel, segments, rot)
 
 
-def wall_rivets(mesh, wall, pts_uz, w, mat):
-    geo.rivets(mesh, [world(wall, u, z, w) for u, z in pts_uz], wall["normal"], mat, S["rivet_r"])
+def wall_rivets(mesh, wall, pts_uz, w, mat, radius=None):
+    geo.rivets(mesh, [world(wall, u, z, w) for u, z in pts_uz], wall["normal"], mat, radius or S["rivet_r"])
+
+
+def wall_bolts(mesh, wall, pts_uz, w, mat, radius=None):
+    geo.bolts(mesh, [world(wall, u, z, w) for u, z in pts_uz], wall["normal"], mat, radius or C.FASTENERS["bolt_r"])
+
+
+def _steps(a, b, pitch):
+    """Points from a to b (both ends) about `pitch` apart."""
+    if b <= a:
+        return [(a + b) / 2]
+    n = max(1, round((b - a) / pitch))
+    return [a + k * (b - a) / n for k in range(n + 1)]
+
+
+def _sheet_paint(rng):
+    r = rng.random()
+    for mat, p in C.PANEL_PAINT.items():
+        if r < p:
+            return mat
+        r -= p
+    return "Kiosk_YellowPaint"
 
 
 def build_wall(mesh, name):
@@ -59,32 +117,80 @@ def build_wall(mesh, name):
     holes = openings(name)
     u_start, u_end = wall["u"][0] + POST, wall["u"][1] - POST
     z_lo, z_hi = PH + S["skirt_h"], TOP - S["topbeam_h"]
-    length = u_end - u_start
-    n = max(1, round(length / C.SEAM_SPACING))
-    pw, gap, t = length / n, S["panel_gap"], S["panel_t"]
+    gap, t, lap_w, lap_t = S["panel_gap"], S["panel_t"], S["lap_w"], S["lap_t"]
+    plan = joint_plan(name)
+    edges = [u_start] + [u for u, _ in plan] + [u_end]
+    kinds = [None] + [k for _, k in plan] + [None]
+    raised = LAYOUT.setdefault(name, [])
+    raised.clear()
+    rng, sp = geo.RNG, C.PANEL_SPLITS
 
-    # Panels (some split horizontally), skipping openings
-    for i in range(n):
-        u0, u1 = u_start + i * pw + gap / 2, u_start + (i + 1) * pw - gap / 2
-        bands = [(z_lo, z_hi)]
-        if geo.RNG.random() < S["split_chance"]:
-            zs = geo.RNG.uniform(*S["split_z"])
-            bands = [(z_lo, zs - gap / 2), (zs + gap / 2, z_hi)]
-        for b0, b1 in bands:
-            for r in geo.subtract_rects((u0, u1, b0, b1), holes):
-                proud = geo.RNG.uniform(0.0, S["panel_jitter_out"])
-                wall_box(mesh, wall, r[0], r[1], r[2], r[3], -t + 0.002, proud, "Kiosk_YellowPaint",
+    # Sheets between the joints. At a "lap" joint the right-hand sheet runs over the left one; a
+    # split sheet's upper part often laps down over the lower part (sheds rain). Lapping parts
+    # stand out by lap_t, with a rivet row along the lap.
+    for i in range(len(edges) - 1):
+        laps_left = kinds[i] == "lap"
+        u0 = edges[i] - lap_w if laps_left else edges[i] + gap / 2
+        u1 = edges[i + 1] - gap / 2
+        proud = lap_t if laps_left else 0.0
+        if rng.random() < S["refit_chance"]:  # a later replacement sheet, a few mm proud
+            proud += rng.uniform(0.002, S["panel_jitter_out"])
+        mat = _sheet_paint(rng)
+        r = rng.random()
+        cuts = []
+        if r < sp["two"]:
+            cuts = [rng.uniform(*sp["z2"][0]), rng.uniform(*sp["z2"][1])]
+        elif r < sp["two"] + sp["one"]:
+            cuts = [rng.uniform(*sp["z1"])]
+        zs = [z_lo] + cuts + [z_hi]
+        for k in range(len(zs) - 1):
+            lap_below = k > 0 and rng.random() < sp["lap"]
+            b0 = zs[k] - lap_w if lap_below else zs[k] + (gap / 2 if k > 0 else 0.0)
+            b1 = zs[k + 1] - (gap / 2 if k < len(zs) - 2 else 0.0)
+            w_out = proud + (lap_t if lap_below else 0.0)
+            band_mat = mat if k == 0 or rng.random() < 0.7 else _sheet_paint(rng)
+            for rr in geo.subtract_rects((u0, u1, b0, b1), holes):
+                wall_box(mesh, wall, rr[0], rr[1], rr[2], rr[3], -t + 0.002, w_out, band_mat,
                          S["panel_bevel"], 1, geo.jitter(S["panel_jitter_tilt_deg"]))
+                raised.append((rr[0], rr[1], rr[2], rr[3], w_out))
+            pitch = rng.uniform(0.08, 0.12)
+            pts = []
+            if lap_below:  # rivet row along the horizontal lap
+                zr = zs[k] - lap_w / 2
+                pts += [(u, zr) for u in _steps(u0 + 0.03, u1 - 0.03, pitch)]
+            if laps_left:  # rivet column along the vertical lap
+                ur = edges[i] - lap_w / 2
+                pts += [(ur, z) for z in _steps(b0 + 0.04, b1 - 0.04, pitch)]
+            wall_rivets(mesh, wall, [p for p in pts if _clear(holes, *p)], w_out, band_mat, C.FASTENERS["rivet_r"])
 
-    # Battens over the joints, with two rivet columns each
-    bw, bt, rp = S["batten_w"], S["batten_t"], S["rivet_pitch"]
-    for i in range(1, n):
-        uj = u_start + i * pw
-        for r in geo.subtract_rects((uj - bw / 2, uj + bw / 2, z_lo, z_hi), holes):
-            wall_box(mesh, wall, r[0], r[1], r[2], r[3], 0.0, bt, "Kiosk_YellowPaint_Dark", 0.003)
-            steps = int((r[3] - r[2] - 0.08) / rp)
-            pts = [(uj + side * bw * 0.31, r[2] + 0.04 + k * rp) for side in (-1, 1) for k in range(steps + 1)]
-            wall_rivets(mesh, wall, pts, bt, "Kiosk_YellowPaint_Dark")
+    # Joint covers: battens (flat bar, two rivet columns), strips (wide plate, paired bolts),
+    # and rivet columns either side of some bare seams. Covers sit on the sheets under them.
+    bw, bt = S["batten_w"], S["batten_t"]
+    covers = []
+    for uj, kind in plan:
+        if kind == "batten":
+            for rr in geo.subtract_rects((uj - bw / 2, uj + bw / 2, z_lo, z_hi), holes):
+                w0 = surface_w(name, *rr) - 0.002
+                wall_box(mesh, wall, rr[0], rr[1], rr[2], rr[3], w0, w0 + bt, "Kiosk_YellowPaint_Dark", 0.003)
+                covers.append((rr[0], rr[1], rr[2], rr[3], w0 + bt))
+                pts = [(uj + side * bw * 0.31, z) for side in (-1, 1) for z in _steps(rr[2] + 0.04, rr[3] - 0.04, rng.uniform(0.08, 0.11))]
+                wall_rivets(mesh, wall, pts, w0 + bt, "Kiosk_YellowPaint_Dark")
+        elif kind == "strip":
+            sw_, st = S["strip_w"], S["strip_t"]
+            for rr in geo.subtract_rects((uj - sw_ / 2, uj + sw_ / 2, z_lo, z_hi), holes):
+                w0 = surface_w(name, *rr) - 0.002
+                wall_box(mesh, wall, rr[0], rr[1], rr[2], rr[3], w0, w0 + st, "Kiosk_YellowPaint_Dark", 0.005, 2)
+                covers.append((rr[0], rr[1], rr[2], rr[3], w0 + st))
+                pts = [(uj + side * sw_ * 0.27, z) for side in (-1, 1) for z in _steps(rr[2] + 0.06, rr[3] - 0.06, rng.uniform(0.22, 0.28))]
+                wall_bolts(mesh, wall, pts, w0 + st, "Kiosk_YellowPaint_Dark", C.FASTENERS["bolt_small_r"])
+        elif kind == "seam" and rng.random() < 0.5:
+            pitch = rng.uniform(0.13, 0.18)
+            pts = [(uj + side * 0.03, z) for side in (-1, 1) for z in _steps(z_lo + 0.08, z_hi - 0.06, pitch)]
+            for p in pts:
+                if _clear(holes, *p):
+                    wall_rivets(mesh, wall, [p], surface_w(name, p[0] - 0.005, p[0] + 0.005, p[1] - 0.005, p[1] + 0.005),
+                                "Kiosk_YellowPaint_Dark", C.FASTENERS["rivet_r"])
+    raised.extend(covers)
 
     # Skirt (dark plinth band), interrupted by the door
     sk_holes = [(h[0], h[1], PH - 1, PH + S["skirt_h"] + 1) for h in holes if h[2] <= PH + 0.01]
@@ -96,7 +202,7 @@ def build_wall(mesh, name):
     # Top beam under the canopy
     wall_box(mesh, wall, wall["u"][0] + POST, wall["u"][1] - POST, TOP - S["topbeam_h"], TOP, -t, S["topbeam_t"],
              "Kiosk_YellowPaint_Dark", 0.005, 1)
-    k = int((length - 0.1) / 0.12)
+    k = int((u_end - u_start - 0.1) / 0.12)
     wall_rivets(mesh, wall, [(u_start + 0.05 + j * 0.12, TOP - S["topbeam_h"] + 0.025) for j in range(k + 1)],
                 S["topbeam_t"], "Kiosk_YellowPaint_Dark")
 

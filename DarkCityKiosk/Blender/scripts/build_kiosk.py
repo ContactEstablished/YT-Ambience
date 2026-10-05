@@ -3,7 +3,10 @@
     blender -b --factory-startup -P build_kiosk.py -- [--render] [--cams A,Mid,B,Corner,Soffit]
 
 Detailed so far: platform, body shell, canopy (step 1), service side + door side (step 2),
-wall clutter + lanterns + posters/stickers + ground props (step 3), roof machinery (step 4).
+wall clutter + lanterns + posters/stickers + ground props (step 3), roof machinery (step 4),
+structural massing (kiosk/massing.py, the 2026-10-04 massing pass; exported as SM_Kiosk_Structure),
+construction detail (kiosk/construction.py, the 2026-10-04 construction pass; SM_Kiosk_Construction),
+the utility network (kiosk/utilities.py, the 2026-10-04 utility pass; SM_Kiosk_Utilities).
 Earlier versions reused grey-box parts (build_kiosk_blockout.py) and
 are replaced step by step. Everything is rebuilt from kiosk_config.py on each run.
 """
@@ -16,7 +19,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import kiosk_config as C  # noqa: E402,F401
 import build_kiosk_blockout as B  # noqa: E402
-from kiosk import canopy, clutter, openings, review, roof, shell  # noqa: E402
+from kiosk import canopy, clutter, construction, massing, openings, review, roof, shell, utilities  # noqa: E402
 
 BLENDER_DIR = os.path.dirname(HERE)
 RENDERS = os.path.join(BLENDER_DIR, "renders")
@@ -39,22 +42,28 @@ def main():
         bsdf.inputs["Metallic"].default_value = metal
     openings.ensure_materials(B)
     clutter.ensure_materials(B)
+    construction.ensure_materials(B)
+    utilities.ensure_materials(B)
     materials = roof.ensure_materials(B)
 
     scene = bpy.context.scene
     kiosk = B.collection("Kiosk")
-    cols = {n: B.collection(n, kiosk) for n in ("Ground", "Body", "ServiceSide", "DoorSide", "Canopy", "Roof", "Props")}
+    cols = {n: B.collection(n, kiosk) for n in ("Ground", "Body", "Structure", "Construction", "ServiceSide", "DoorSide", "Canopy", "Roof",
+                                              "Props", "Utilities")}
     cutters = B.collection("Cutters", kiosk)
     cutters.hide_render = True
     review_coll = B.collection("Review")
 
     shell.build_platform(cols["Ground"], materials)
     shell.build_body(cols["Body"], cutters, materials)
+    massing.build(cols["Structure"], materials)
+    construction.build(cols["Construction"], materials)  # after the shell + massing: it lays parts on their surfaces
     openings.build_service_side(cols["ServiceSide"], materials, B)
     openings.build_door_side(cols["DoorSide"], materials, B)
     canopy.build(cols["Canopy"], materials, B)
     roof.build(cols["Roof"], materials)
     clutter.build(cols["Props"], materials, B)
+    utilities.build(cols["Utilities"], materials)  # last: it routes between everything above
 
     review.setup_scene(scene, review_coll, materials)
     cams = review.cameras(review_coll)

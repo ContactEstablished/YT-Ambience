@@ -1,0 +1,10 @@
+{
+  "name": "dark-city-kiosk-tools",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Node tools for the Dark City Kiosk scene (kiosk graphics art via headless Chromium)",
+  "devDependencies": {
+    "playwright": "1.62.1"
+  }
+}

@@ -1,6 +1,8 @@
 """Render LS_Sweep with Movie Render Queue.
     node Scripts/ue.mjs Scripts/render.py [--tag preview] [--res 1920x1080] [--frames 0-720]
                                           [--spatial 1] [--temporal 1] [--warmup 48] [--fog-clear]
+                                          [--sequence LS_Sweep]
+--sequence: which level sequence to render (LS_Review: the close-up review cameras, make_review.py).
 --frames: one contiguous range per call, e.g. '0-720' (full sweep) or '180-181' (one still).
 Never queue several jobs: EasyRain's GPU particles crashed the editor at the MRQ job hand-over.
 Frames go to DarkCityKiosk/Renders/frames/<tag>/LS_Sweep.<frame>.png; encode a range with
@@ -41,6 +43,7 @@ fog_clear = "--fog-clear" in args
 if fog_clear:
     args.remove("--fog-clear")
 tag = opt("--tag", "preview")
+SEQ = f"{dck.GAME}/Sequences/{opt('--sequence', 'LS_Sweep')}"
 res = tuple(int(v) for v in opt("--res", "1920x1080").split("x"))
 frames_arg = opt("--frames", "0-720")
 spatial = opt("--spatial", 1, int)
@@ -70,7 +73,7 @@ if subsystem.is_rendering():
     raise RuntimeError("a Movie Render Queue render is already running")
 queue = subsystem.get_queue()
 queue.delete_all_jobs()
-seq_path = unreal.SoftObjectPath(f"{dck.SEQUENCE}.{dck.SEQUENCE.rsplit('/', 1)[1]}")
+seq_path = unreal.SoftObjectPath(f"{SEQ}.{SEQ.rsplit('/', 1)[1]}")
 map_path = unreal.SoftObjectPath(dck.world().get_path_name())
 
 if len(ranges) > 1:
@@ -103,7 +106,7 @@ FOG_WAVE_PROPS = ("FogDensity", "VolumetricFogExtinctionScale", "VolumetricFogEm
 
 
 def set_fog_waves(active):
-    seq = unreal.load_asset(dck.SEQUENCE)
+    seq = unreal.load_asset(SEQ)
     n = 0
     for b in seq.get_bindings():
         for tr in b.get_tracks():
