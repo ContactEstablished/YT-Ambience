@@ -3,7 +3,7 @@
   "transition_seconds": 0.8,
   "screens": {
     "LeftA_0": {
-      "type": "ad", "size": [1024, 1920], "offset": 0.0,
+      "type": "ad", "size": [1024, 1920], "offset": 1.5,
       "slides": [
         {"image": "ad_humanity.png", "lines": ["HUMANITY", "UPGRADED"], "jp": "より高く", "tint": [0.35, 0.70, 1.00], "layout": "bottom"},
         {"image": "android-woman-cyberpunk.png", "lines": ["MORE THAN", "HUMAN"], "jp": "それ以上", "tint": [0.60, 0.40, 1.00], "layout": "bottom"}

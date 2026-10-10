@@ -11,6 +11,10 @@ everything from scratch; this touches only the kiosk):
    sign, the ramen lantern, window lightbox, and the interior light from scene_config.INTERIOR) to the
    positions in kiosk_config. Intensities and colours stay as they are.
 6. re-applies the signage pass (kiosk_graphics.apply(): overrides, decals, the 24h sign light).
+7. re-applies the kitchen pass (kiosk_kitchen.apply(full=True)): re-trims the old interior out of copies of the
+   re-imported ServiceSide / Body and puts them back on those actors, the kitchen actors, instances and lights.
+8. re-applies the exterior pass (kiosk_exterior.apply(full=True)): re-trims the old ground props out of a copy of
+   the re-imported Props and puts it back on that actor, the exterior actors and instances.
 
     node Scripts/ue.mjs Scripts/kiosk_refresh.py [--no-import]
 """
@@ -136,6 +140,18 @@ if dck.EAL.does_asset_exist(f"{dck.GAME}/Kiosk/Graphics/M_KioskGraphic"):
     import kiosk_graphics  # noqa: E402
     kiosk_graphics = importlib.reload(kiosk_graphics)
     kiosk_graphics.apply()
+
+# 7. Kitchen pass (2026-10-09): step 2 put the untrimmed ServiceSide / Body back on their actors
+if dck.EAL.does_asset_exist(f"{dck.GAME}/Kiosk/Kitchen/M_Kitchen"):
+    import kiosk_kitchen  # noqa: E402
+    kiosk_kitchen = importlib.reload(kiosk_kitchen)
+    kiosk_kitchen.apply(full=True)
+
+# 8. Exterior pass (2026-10-09): step 2 put the untrimmed Props (with the old ground props) back on its actor
+if dck.EAL.does_asset_exist(f"{dck.GAME}/Kiosk/Exterior/M_Exterior"):
+    import kiosk_exterior  # noqa: E402
+    kiosk_exterior = importlib.reload(kiosk_exterior)
+    kiosk_exterior.apply(full=True)
 
 dck.LEVELS.save_current_level()
 print("kiosk_refresh: done")

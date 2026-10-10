@@ -24,6 +24,9 @@ import scene_config as S  # noqa: E402
 
 dck, mk, S = importlib.reload(dck), importlib.reload(mk), importlib.reload(S)
 import unreal  # noqa: E402
+import wetfx_hlsl as W  # noqa: E402
+
+W = importlib.reload(W)
 
 MAT = f"{dck.GAME}/Materials"
 SC = "/Game/StarterContent/Textures"
@@ -170,16 +173,25 @@ def build():
 
     # puddle normal: EasyRain's raindrop rings plus a breath of wind
     r = g["ripples"]
-    rain = fn(f"{ER}/MF_EasyRain_ripplesRain", -1100, 700)
-    mk.link(xy, "", rain, "World Position XY")
-    for pin, key in (("Speed", "speed"), ("Normal Intensity", "normal"), ("Tiling", "tiling"), ("Intensity", "amount")):
-        mk.link(const(r[key], -1300, 700 + len(pin) * 3), "", rain, pin)
+    if S.WET_FX.get("ground_ripples_loop_clock") and dck.EAL.does_asset_exist(W.MPC):
+        # rain contact pass (prompt 9): the same rings as EasyRain's MF_EasyRain_ripplesRain, on the MPC_WetFX loop
+        # clock (whole cycles per loop), so the puddles join the loop seam exactly
+        rn = W.ripple_node(m, xy, -1100, 700, r["speed"], r["tiling"], r["normal"])
+        rain = mk.expr(m, unreal.MaterialExpressionComponentMask, -950, 700, r=True, g=True, b=True, a=False)
+        mk.link(rn, "", rain, "")
+        rain_out = ""
+    else:
+        rain = fn(f"{ER}/MF_EasyRain_ripplesRain", -1100, 700)
+        mk.link(xy, "", rain, "World Position XY")
+        for pin, key in (("Speed", "speed"), ("Normal Intensity", "normal"), ("Tiling", "tiling"), ("Intensity", "amount")):
+            mk.link(const(r[key], -1300, 700 + len(pin) * 3), "", rain, pin)
+        rain_out = "Result"
     wind = fn(f"{ER}/MF_EasyRain_ripplesWind", -1100, 950)
     mk.link(xy, "", wind, "World Position XY")
     for pin, key in (("Wind Speed", "wind_speed"), ("Normal Intensity", "wind_normal"), ("Tiling", "wind_tiling")):
         mk.link(const(r[key], -1300, 950 + len(pin) * 3), "", wind, pin)
     add = mk.expr(m, unreal.MaterialExpressionAdd, -850, 800)
-    mk.link(rain, "Result", add, "A")
+    mk.link(rain, rain_out, add, "A")
     mk.link(wind, "", add, "B")
     rg = mk.expr(m, unreal.MaterialExpressionComponentMask, -700, 800, r=True, g=True, b=False, a=False)
     mk.link(add, "", rg, "")

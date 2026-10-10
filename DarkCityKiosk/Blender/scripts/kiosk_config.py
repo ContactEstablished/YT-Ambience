@@ -244,6 +244,43 @@ GRAPHICS_REVIEW_CAMS = {
     "RightSign": ((0.80, Y0 - 3.55, 1.05), (X1 + 0.25, Y0 - 0.45, 2.00), 24),  # 24h sign, corner sign, window lightbox
     "DecalCloseup": ((X0 - 1.30, -1.30, 1.05), (X0, -0.72, 0.92), 34),  # door-wall poster cluster and old residue
 }
+# Kitchen pass (2026-10-09, prompt 7): shots appended after the signage ones (older shots keep their
+# frames); make_review.py adds "Cinematic" (the sweep camera at Mid, theta 0) after these.
+KITCHEN_REVIEW_CAMS = {
+    "KitchenPOS": ((-1.55, Y0 - 1.25, 1.50), (-2.33, Y0 - 0.12, 1.30), 35),  # the order terminal, angled
+    "KitchenShelves": ((-1.05, Y0 - 0.60, 1.42), (-0.70, -0.05, 1.45), 24),  # into the opening: back wall + shelving
+    "CounterTop": ((-1.45, Y0 - 0.95, 1.50), (-1.15, Y0 - 0.20, 1.00), 28),  # the customer counter's surface
+    "UnderCounter": ((-0.75, Y0 - 1.75, 0.50), (-0.75, Y0, 0.52), 20),  # storage under the counter
+}
+# Exterior pass (2026-10-09, prompt 8): ground props round the footprint. Appended after "Cinematic" (older
+# shots keep their frames); make_review.py adds "OrbitA" / "OrbitB" (the sweep camera at its two stops) after these.
+EXTERIOR_REVIEW_CAMS = {
+    "ExtDoorSide": ((X0 - 3.2, -0.70, 1.00), (X0 - 0.40, 1.20, 0.60), 24),  # the door-side delivery / storage cluster, door at right
+    "ExtDoorCorner": ((X0 - 2.0, Y0 - 1.75, 0.80), (X0 - 0.25, Y0 + 0.25, 0.45), 28),  # bins and empties at the front-left corner
+    "ExtService": ((1.10, Y0 - 3.0, 0.85), (X1 + 0.25, Y0 - 0.35, 0.55), 26),  # the service cluster at the front-right corner
+    "ExtFrontLow": ((-0.85, Y0 - 2.9, 0.42), (-0.85, Y0, 0.50), 18),  # stools, under-counter storage, clearances
+}
+
+# Rain contact pass (2026-10-09, prompt 9): appended after OrbitB in LS_Review (older shots keep their frames).
+WET_REVIEW_CAMS = {
+    "WetFrontLeft": ((X0 - 1.85, Y0 - 1.95, 0.55), (X0 - 0.55, Y0 - 0.55, 0.14), 24),  # the platform's wet/dry transition at the near corner
+    "WetDrain": ((1.55, Y0 - 1.95, 0.62), (2.45, Y0 - 0.62, 0.16), 26),  # the front-right downpipe, its splash block and run-off trail
+    "WetDripCorner": ((X0 - 2.85, Y0 - 3.15, 1.10), (X0 - 0.90, Y0 - 0.90, 1.10), 22),  # the near corner post's drip
+    "WetDrip": ((1.15, Y0 - 3.30, 1.15), (2.62, Y0 - 0.88, 1.12), 22),  # the edge-box drip (after WetDripCorner: its 16 frames catch a drop falling and landing): source under the fascia, fall, landing
+    "WetSteamPot": ((-0.62, Y0 - 0.95, 1.55), (-0.17, -0.30, 1.45), 35),  # the stock pot's wisp under the hood
+}
+# A fixed camera for the motion preview (make_review.py builds LS_WetFX from LS_Sweep with this camera)
+WET_MOTION_CAM = ((0.95, Y0 - 3.90, 0.55), (2.35, Y0 - 0.55, 1.45), 20)
+
+# Final polish (prompt 10): longer lenses from the video camera's own positions, so a close look keeps the viewer's
+# perspective: name -> (orbit angle deg: 0 = Cinematic, -/+ VIDEO_CAM arc = orbit stops A / B, look-at target, lens mm).
+# make_review.py --polish builds LS_Polish: Cinematic, OrbitA, OrbitB, these, then POLISH_DETAIL_SHOTS (existing cams).
+POLISH_REVIEW_CAMS = {
+    "CineRoof": (0.0, (-0.75, -0.55, 4.05), 50),  # the roof machinery and the flue plume as the cinematic camera sees them
+    "OrbitARoof": (-45.0, (-1.10, 0.10, 3.95), 50),
+    "OrbitBRoof": (45.0, (0.10, -0.95, 4.00), 50),  # the vessel, tanks, reel and the kitchen fan's plume
+}
+POLISH_DETAIL_SHOTS = ["CounterTop", "ExtDoorCorner", "DecalCloseup", "WetSteamPot"]
 
 # ---- Detailed shell (build_kiosk.py) -------------------------------------------------
 SHELL = {
@@ -618,7 +655,7 @@ GRAPHICS_CARDS = [
     # the green bin hides the wall below ~0.85 m between y -1.4 and -0.78, so the cluster sits above that
     # line, the KAZE poster's logo just under the box and the older prints spilling over the batten. --
     ("ramen_ad", _L, -0.765, 0.80, -1.5, 0, {"age": 0.9}),  # faded food ad across the batten, clear of the hatch frame
-    ("kaze_poster", _L, -0.88, 0.905, 1.2, 2, {"age": 0.25, "lift": ("bl", 0.07, 0.014)}),  # newest; top just under the box
+    ("kaze_poster", _L, -0.88, 0.905, 1.2, 2, {"age": 0.6, "lift": ("bl", 0.07, 0.014)}),  # newest, a season old (prompt 10: was age 0.25, read clean); top just under the box
     ("market_flyer", _L, -0.56, 1.21, -2.5, 1, {"age": 0.7, "lift": ("br", 0.05, 0.010)}),  # torn, behind the pull box riser
     ("tape_scrap_0", _L, -0.615, 1.43, 10, 0, {"age": 0.8}),  # corners of notices ripped off long ago
     ("tape_scrap_1", _L, -0.43, 1.02, -20, 0, {"age": 0.8}),
@@ -649,8 +686,8 @@ GRAPHICS_CARDS = [
     ("permit", _F, -0.185, 1.665, 0.0, 0, {"depth": 0.40, "scale": 0.95, "age": 0.6}),  # right jamb
     ("price_note", _F, -0.19, 1.47, 3.0, 0, {"depth": 0.40, "scale": 0.95, "age": 0.3}),
     ("pay_decal", _F, -0.185, 1.22, 0.0, 0, {"depth": 0.40, "age": 0.3, "lift": ("tr", 0.025, 0.004)}),
-    ("ticket_strip", _F, -2.36, 1.62, 0.0, 0, {"depth": 0.45, "scale": 0.95}),  # ticket machine
-    ("asset_a", _F, -2.25, 1.08, 0.0, 0, {"depth": 0.45}),
+    # (the ticket machine's ticket_strip and asset_a went with it in the kitchen pass, 10/9: the order
+    # terminal that replaces it carries its own labels, kiosk/kitchen.py)
     ("id_sg4", _F, -2.44, 1.88, 0.0, 0, {"depth": 0.30}),  # small box above the machine
     # -- front wall: the strip between the opening and the window bay ---------------------------
     ("clinic_poster", _F, 0.255, 1.33, -1.0, 0, {"age": 0.6}),
@@ -696,3 +733,138 @@ SIGN_24H = {"pole": (LANTERN_R["x"] + 0.12, LANTERN_R["y"]), "pole_r": 0.02, "po
 # The ramen lantern's lettering, bent onto the paper: (text, size m, angle round the lantern in rad from
 # the camera-facing side (+ = the viewer's right), z offset m)
 LANTERN_LETTERING = [("ラ\n｜\nメ\nン", 0.095, 0.0, 0.01), ("醤\n油\n・\n味\n噌", 0.036, -0.62, 0.035)]
+
+# ---- Kitchen pass (2026-10-09, prompt 7): the service opening's working kitchen -------------------
+# Built on its own (kiosk/kitchen.py, build_kitchen.py -> Unreal/RawContent/kiosk_kitchen.glb), so the
+# kiosk export and its weathering bake stay untouched. Unreal trims the old step-2 interior (stock
+# shelves, coffee machine, pots, condiments, the ticket machine) out of copies of SM_Kiosk_ServiceSide
+# and SM_Kiosk_Body (kiosk_kitchen.py, GeometryScript), and with it the service cavity's lining, so
+# the room can be deeper and taller than the old 0.9 m recess.
+# Layering seen through the opening: customer counter -> heavy frame -> pass + prep worktop (front)
+# -> cooking line on the back counter under a hood -> shelves on the back wall -> darker back corners.
+KITCHEN = {
+    "front": Y0 + 0.195,  # the room's front wall face: right behind the inner frame at the back of the reveal
+    "x0": -2.35, "x1": 0.62,  # wider than the opening: the orbit looks right-back through it, at the right wall
+    "depth": 1.45,  # front wall to back wall (was a 0.9 m recess)
+    "ceiling": 2.10,  # rear ceiling; a bulkhead keeps the opening head (and the prep light) at 1.80
+    "bulkhead_d": 0.25,
+    "front_top": 1.012, "front_d": 0.42,  # pass + prep worktop along the front wall (a step above the customer counter)
+    "back_top": 0.98, "back_d": 0.48,  # the cooking line (and the prep sink) along the back wall
+    "tile_top": 1.46,  # white subway-tile splashback up to here, stainless above
+    "shelves": (1.50, 1.80),  # back-wall shelves: middle (seasonings, ingredients, bowls), top (backup stock, packaging)
+    "shelf_d": (0.27, 0.30),
+    "hood": (-1.05, 0.05),  # extraction hood over the noodle boiler and the stock pot (x range)
+    "boiler": (-0.98, -0.42),  # noodle boiler (tebo wells), built into the back counter
+    "burner": (-0.36, 0.02),  # stock-pot burner
+    "coffee_x": 0.10,  # coffee from here to the right wall (front worktop and back counter)
+}
+# The order terminal at the counter's left end, where the reference has its angled payment unit
+# (replaces the step-2 ticket machine, same footprint so the wall behind stays covered):
+# a wall pedestal, a payment unit with a sloped keypad deck, and a hooded screen pod tilted back.
+POS = {"x0": X0 + 0.077, "x1": X0 + 0.453, "z0": COUNTER["z"], "pedestal_d": 0.09, "deck": (0.27, 0.10, 0.17),
+       "pod": (1.27, 1.61), "pod_d": (0.25, 0.15), "visor": 0.07}
+# Storage under the customer counter (outside, mostly in the canopy's shadow): an under-counter fridge,
+# drawers under the terminal end.
+# Exterior pass (2026-10-09, prompt 8): the fridge (was a two-door unit at x -0.43..0.21, right behind the
+# right stool, filling the sitter's knee space and covering the access panel) is now a narrower single-door
+# unit between the right stool and the gusset at 0.53, hinged on its right so the door swings away from the
+# stool; the noodle boxes and the spare stock pot that stood in front of the gas / water entry are gone
+# (the cartons wait behind the back-left corner instead, EXTERIOR["cartons"]).
+UNDER_COUNTER = {
+    "fridge": (0.08, 0.50, 0.70),  # x0, x1, top z (base frame front + 1 cm .. counter underside)
+    "fridge_hinge": "right",
+    "drawers": (X0 + 0.11, X0 + 0.43, 0.61),  # under the left gusset (its strut starts at 0.62)
+}
+
+# ---- Exterior pass (2026-10-09, prompt 8): ground props round the footprint ------------------------
+# Built on its own (kiosk/exterior.py, build_exterior.py -> Unreal/RawContent/kiosk_exterior.glb); Unreal
+# trims the old step-3 ground props (crates, the green cabinet, the red crate, the bins, the utility cabinet,
+# the lantern's box pedestal, the flattened cartons, the junction box's floor cable) out of a copy of
+# SM_Kiosk_Props (kiosk_exterior.py), so the kiosk export and its weathering bake stay untouched.
+# Working zones (kept clear on purpose): the staff door's apron and swing (left wall, y -0.30..0.80 out to
+# ~0.9 m), the electrical cabinet and exhaust fan beside it (y 0.80..1.35), the door-wall access panel
+# (y -0.70..-0.30), the gas / water entry under the counter, the stools' knee space, the fridge door, the
+# utility cabinet's door, both drain splash zones, and every walking route off the platform.
+# Positions: centres in the kiosk frame (m), sizes (x, y, z), yaw in degrees.
+EXTERIOR = {
+    # back-left, inside the railing: the lantern's pedestal rebuilt as a ballasted crate, a steel case and a
+    # timber riser under the pole's flange (same top, PH + 0.90, so the pole and lantern stay put)
+    "pedestal": {"x": LANTERN_L["x"], "y": LANTERN_L["y"], "tiers": (0.34, 0.30, 0.26)},
+    # deliveries waiting against the railing: two stacking crates (long side along y), and on top the red crate of
+    # empties going back with the driver (the scene's red accent, beside the lantern as in the reference)
+    "crate_stack": {"x": X0 - 0.66, "y": Y1 + 0.25, "yaw": -90.0, "top_yaw": -4.0},  # label panels face the street (-X)
+    # the dry-stock locker (was the green equipment cabinet, which overhung the platform edge and the railing
+    # ran through it): back of the pen, its door facing the work space behind the kiosk's corner
+    "locker": {"x": X0 - 0.595, "y": Y1 + 0.73, "size": (0.46, 0.38, 1.05)},
+    # cardboard, kept dry: two cartons on timber bearers behind the back-left corner, under the canopy's back
+    # overhang (seen past the corner from the orbit's door-side end)
+    "cartons": {"x": X0 + 0.30, "y": Y1 + 0.27, "yaw": 2.0},
+    # splash block under the old back-left downpipe's shoe (its water now lands on concrete, not on stock)
+    "splash_left": {"x": X0 - 0.346, "y": Y1 + 0.267, "size": (0.22, 0.16, 0.04), "yaw": 146.5},
+    # front-left corner, by the counter's end: the customer bin (near the old green bin, whose grime the
+    # wall's weathering bake already shows) and a lidded tote of cup stock beside it
+    "bin_burnable": {"x": X0 - 0.365, "y": Y0 + 0.26, "size": (0.40, 0.40, 0.62), "yaw": 3.0},  # lid top ~0.80 m, as the old barrel: the KAZE poster above stays readable
+    "tote": {"x": X0 - 0.345, "y": Y0 + 0.765, "yaw": -93.0},  # its label side to the street
+    # the junction box's floor cable, re-run down the wall to a floor gland clear of the bin
+    "jb_cable": {"x": X0 - 0.115, "y": Y0 + 0.25},
+    # front-right: the utility cabinet (on a stand, clear of the corner angle, the 24h pole clamped to its side;
+    # door on the street side, hinged on the right), the gas cylinders' cage beside it (gate on the platform's
+    # edge side, regulator on the back post, the pipe into the right wall's base hidden behind the corner),
+    # and the cans bin moved in front of the bay's corner, clear of the vent grille and the drain
+    "utility_cabinet": {"x": X1 + 0.22, "y": Y0 - 0.285, "size": (0.43, 0.37, 0.74), "stand": 0.10},
+    "cylinder_cage": {"x": X1 + 0.725, "y": Y0 - 0.43, "size": (0.46, 0.60, 0.78)},
+    "bin_cans": {"x": X1 - 0.48, "y": Y0 - 0.33, "radius": 0.19, "h": 0.48},
+    # canopy footprint for the materials' rain exposure (Unreal: world-space wetness, kiosk_exterior.py)
+    "canopy": (CANOPY_X0, CANOPY_X1, CANOPY_Y0, CANOPY_Y1, CANOPY_BOTTOM),
+}
+
+# ---- Rain contact pass (2026-10-09, prompt 9) -------------------------------------------------------
+# Where rain reaches the platform, where runoff collects and drains, which canopy points drip, and where steam
+# rises. build_rain_contact.py (Blender, on kiosk_exterior.blend) traces rain through the finished kiosk and its
+# props, paints a top-down wet map of the platform (Unreal/RawContent/rain/T_RainContact.png) and resolves the
+# exact sources / landing points below by ray casts (rain/rain_contact.json). Unreal: Scripts/wet_fx.py.
+# Everything is in the kiosk frame (metres). Drip and steam timing lives in Unreal's scene_config.WET_FX.
+RAIN_CONTACT = {
+    "map_half_m": 4.096,  # the map covers +-4.096 m round the kiosk centre...
+    "map_px": 2048,  # ...at 4 mm a texel
+    "exposure_px": 512,  # rain exposure is traced at 16 mm (40 rays a texel), then filtered up
+    "rays": 40,
+    # rain direction: falling ~6 deg off vertical toward +X+Y (blown from the street on the camera side, so the
+    # front and door-side edges catch wind-driven rain under the canopy), with gusts
+    "wind": (0.07, 0.07), "gust": 0.20,
+    # the wet/dry line: exposure through smoothstep(lo, hi), broken up by noise (no rectangle under the canopy edge)
+    "wet_lo": 0.06, "wet_hi": 0.5, "edge_noise": 0.42,
+    "splashback_m": 0.10,  # rain landing on the exposed band spatters this far into the sheltered concrete
+    "edge_wick_m": (0.02, 0.06),  # street splash and wicking along the slab's outer edge (min, max width)
+    "contact_halo_m": 0.025,  # darkening round anything standing on the slab (feet, bases, the walls)
+    # shallow pools: a gentle height field; water stands only where rain or runoff feeds it, never in the
+    # customer standing area in front of the counter
+    "pool_level": 0.355, "pool_soft": 0.06,
+    "lip_pool_m": 0.05,  # behind the steel edge angle (front and door side, 4 mm proud) water dams in a narrow line
+    "no_pool": [((-2.20, -2.75), (0.45, -1.65))],  # the counter's standing area (x0, y0), (x1, y1)
+    # canopy drips: a few chosen points (not an even row): name -> (x, y) under the fascia's drip edge or a post.
+    # Exact source and landing heights come from ray casts. "trail" = a short wet trail from the landing spot.
+    "drips": {
+        "corner_fl": {"xy": (-3.525, -2.605), "trail": (-0.06, -0.08)},  # the near corner post (front-left), on the camera's side
+        "front_joint": {"xy": (1.02, -2.585), "trail": (0.0, -0.10)},  # a fascia panel joint in front of the glazed window bay
+        "edge_box": {"xy": (2.63, -2.585), "trail": (-0.04, -0.10)},  # beside the canopy's drain edge box: the slightly stronger one
+        "left_joint": {"xy": (-3.505, 1.02), "trail": (-0.10, 0.0)},  # door side, past the door, before the lantern's pedestal
+        "right_edge": {"xy": (3.16, -0.62), "trail": (0.30, 0.02)},  # the right fascia (seen from the orbit's service-side end)
+    },
+    "splash_r_m": 0.12,  # spatter round each drip's landing spot
+    # downpipe outlets: water leaves the shoe, lands on its splash block and runs off as a narrow trail
+    "outlets": {
+        "pipe_fr": {"mouth": (2.46, -2.012, 0.190), "land": (2.455, -2.075), "trail": [(2.45, -2.15), (2.47, -2.32), (2.44, -2.50), (2.46, -2.69)]},
+        "pipe_bl": {"mouth": (-2.862, 1.895, 0.155), "land": (-2.93, 1.94), "trail": [(-2.99, 2.02), (-2.93, 2.20), (-2.92, 2.42), (-2.90, 2.69)]},
+    },
+    "trail_w_m": (0.05, 0.10),
+    "grate": {"xy": (-1.33, -2.04), "r_m": 0.10},  # the drain hose's floor grate under the counter (utilities.py: SERVICE_ENTRY)
+    # steam: the stock pot's broth (inside, under the hood) and the kitchen's roof exhaust fan (mushroom fan,
+    # back centre; the kitchen's duct runs up to it). Never near the gas cage or the electrical cabinet.
+    "steam": {
+        "pot": {"xy": (-0.17, -0.305), "z": 1.34, "rise_m": 0.34, "w_m": 0.30},
+        "roof_fan": {"xy": (EXHAUST_FAN["cx"], EXHAUST_FAN["cy"]), "z": CANOPY_TOP + 0.30, "rise_m": 1.6, "w_m": 0.9},
+        # the gas appliances' flue (back-left, rain cap at ~4.0 m): seen past the roof's silhouette from the floor camera
+        "flue": {"xy": (EXHAUST_STACK["cx"], EXHAUST_STACK["cy"]), "z": CANOPY_TOP + EXHAUST_STACK["h"] + 0.12, "rise_m": 1.4, "w_m": 0.7},
+    },
+}

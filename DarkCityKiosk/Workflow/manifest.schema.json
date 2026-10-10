@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Claude completed render package v1",
+  "type": "object",
+  "required": ["schema_version", "round_id", "job_id", "prompt_path", "prompt_sha256", "status", "render_active", "outputs", "changes", "validation", "known_issues", "unverified_requirements"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "round_id": { "type": "string", "pattern": "^[A-Z]+-[0-9]{2}(-R[12])?$" },
+    "job_id": { "type": "string" },
+    "prompt_path": { "type": "string" },
+    "prompt_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "status": { "const": "complete" },
+    "render_active": { "const": false },
+    "outputs": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "required": ["path", "kind", "sha256", "description", "source"],
+        "properties": {
+          "path": { "type": "string" },
+          "kind": { "enum": ["image", "video", "report"] },
+          "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "description": { "type": "string" },
+          "source": { "type": "string", "description": "Source frames/video timestamp, render settings and log provenance" }
+        }
+      }
+    },
+    "changes": { "type": "array", "items": { "type": "string" } },
+    "validation": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "required": ["check", "result", "details"],
+        "properties": {
+          "check": { "type": "string" }, "result": { "enum": ["PASS", "FAIL", "UNVERIFIED"] }, "details": { "type": "string" }
+        }
+      }
+    },
+    "known_issues": { "type": "array", "items": { "type": "string" } },
+    "unverified_requirements": { "type": "array", "items": { "type": "string" } }
+  }
+}

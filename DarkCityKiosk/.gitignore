@@ -41,3 +41,6 @@ Blender/weather_cache/
 Graphics/preview/
 # Signage-pass check file (Blender/scripts/build_graphics.py regenerates it in seconds)
 Blender/kiosk_graphics.blend
+# Generated combined scenes used for kitchen/exterior checks (rebuild from their scripts).
+Blender/kiosk_kitchen.blend
+Blender/kiosk_exterior.blend

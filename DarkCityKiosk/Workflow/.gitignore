@@ -1,0 +1,8 @@
+# Retain locally; do not accidentally publish model transcripts or large fixture runs.
+/logs/
+/*.lock
+/*.tmp
+/operator-ready.json
+/WAKE
+# Generated permission-preflight run evidence; retain the scripts and prompts above it.
+/permission-check/*/

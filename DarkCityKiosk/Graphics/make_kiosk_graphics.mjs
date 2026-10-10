@@ -29,8 +29,10 @@ const ATLASES = {
   Labels: { size: 2048, s: 5, gutter: 12, fill: [200, 200, 200, 0] },
   Signs: { size: 2048, s: 2, gutter: 12, fill: [250, 220, 120, 0] },
   Decals: { size: 2048, s: 2, gutter: 12, fill: [200, 160, 60, 0] },
+  Kitchen: { size: 2048, s: 4, gutter: 12, fill: [120, 120, 120, 0] },  // kitchen pass (10/9): terminal, tickets, tape labels, packaging
+  Exterior: { size: 2048, s: 4, gutter: 12, fill: [110, 110, 105, 0] },  // exterior pass (10/9): crates, bins, cylinders, cabinet, cartons
 };
-const SCRIPTS = ['lib.js', 'paper.js', 'labels.js', 'signs.js', 'decals.js', 'build.js'];
+const SCRIPTS = ['lib.js', 'paper.js', 'labels.js', 'signs.js', 'decals.js', 'kitchen.js', 'exterior.js', 'build.js'];
 
 const argv = process.argv.slice(2);
 const onlyIdx = argv.indexOf('--only');

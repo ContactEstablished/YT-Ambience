@@ -1,0 +1,9 @@
+{
+  "type": "object", "additionalProperties": false,
+  "required": ["round_id", "queued", "prompt"],
+  "properties": {
+    "round_id": { "type": "string", "enum": ["TRAIN-01"] },
+    "queued": { "type": "boolean", "enum": [false] },
+    "prompt": { "type": "string" }
+  }
+}

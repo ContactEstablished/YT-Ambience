@@ -1,0 +1,164 @@
+{
+ "drips": {
+  "corner_fl": {
+   "src": [
+    -3.525,
+    -2.605,
+    2.1
+   ],
+   "land": [
+    -3.525,
+    -2.605,
+    0.12
+   ],
+   "src_on": "SM_Kiosk_Canopy",
+   "land_on": "SM_Kiosk_Ground",
+   "fall_m": 1.98
+  },
+  "front_joint": {
+   "src": [
+    1.02,
+    -2.585,
+    2.15
+   ],
+   "land": [
+    1.02,
+    -2.585,
+    0.12
+   ],
+   "src_on": "SM_Kiosk_Canopy",
+   "land_on": "SM_Kiosk_Ground",
+   "fall_m": 2.03
+  },
+  "edge_box": {
+   "src": [
+    2.63,
+    -2.585,
+    2.15
+   ],
+   "land": [
+    2.63,
+    -2.585,
+    0.12
+   ],
+   "src_on": "SM_Kiosk_Canopy",
+   "land_on": "SM_Kiosk_Ground",
+   "fall_m": 2.03
+  },
+  "left_joint": {
+   "src": [
+    -3.505,
+    1.02,
+    2.15
+   ],
+   "land": [
+    -3.505,
+    1.02,
+    0.12
+   ],
+   "src_on": "SM_Kiosk_Canopy",
+   "land_on": "SM_Kiosk_Ground",
+   "fall_m": 2.03
+  },
+  "right_edge": {
+   "src": [
+    3.16,
+    -0.62,
+    2.15
+   ],
+   "land": [
+    3.16,
+    -0.62,
+    0.12
+   ],
+   "src_on": "SM_Kiosk_Canopy",
+   "land_on": "SM_Kiosk_Ground",
+   "fall_m": 2.03
+  }
+ },
+ "outlets": {
+  "pipe_fr": {
+   "mouth": [
+    2.46,
+    -2.012,
+    0.19
+   ],
+   "land": [
+    2.455,
+    -2.075,
+    0.15
+   ],
+   "land_on": "SM_Kiosk_Utilities"
+  },
+  "pipe_bl": {
+   "mouth": [
+    -2.862,
+    1.895,
+    0.155
+   ],
+   "land": [
+    -2.93,
+    1.94,
+    0.138
+   ],
+   "land_on": "SM_Kiosk_Exterior"
+  }
+ },
+ "steam": {
+  "pot": {
+   "xy": [
+    -0.17,
+    -0.305
+   ],
+   "z": 1.34,
+   "rise_m": 0.34,
+   "w_m": 0.3,
+   "surface_z": 2.272,
+   "surface_on": "SM_Kiosk_Canopy"
+  },
+  "roof_fan": {
+   "xy": [
+    -0.2,
+    0.95
+   ],
+   "z": 3.17,
+   "rise_m": 1.6,
+   "w_m": 0.9,
+   "surface_z": 3.33,
+   "surface_on": "SM_Kiosk_Roof"
+  },
+  "flue": {
+   "xy": [
+    -2.15,
+    1.55
+   ],
+   "z": 3.99,
+   "rise_m": 1.4,
+   "w_m": 0.7,
+   "surface_z": 4.1,
+   "surface_on": "SM_Kiosk_Roof"
+  }
+ },
+ "grate": {
+  "xy": [
+   -1.33,
+   -2.04
+  ],
+  "z": 0.128,
+  "on": "SM_Kiosk_Utilities"
+ },
+ "map": {
+  "half_m": 4.096,
+  "px": 2048,
+  "note": "u = (x + half) / (2 half), v = (y + half) / (2 half) in the kiosk frame; v = 0 is the top row"
+ },
+ "platform": {
+  "rect": [
+   -3.625,
+   3.625,
+   -2.7,
+   2.7
+  ],
+  "h": 0.12
+ }
+}

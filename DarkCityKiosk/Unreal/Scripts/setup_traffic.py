@@ -21,8 +21,9 @@ import matkit as mk  # noqa: E402
 import scene_config as S  # noqa: E402
 import traffic_lanes as TL  # noqa: E402
 import traffic_plan as TP  # noqa: E402
+import wetfx_hlsl as W  # noqa: E402
 
-dck, mk, S, TL, TP = (importlib.reload(m) for m in (dck, mk, S, TL, TP))
+dck, mk, S, TL, TP, W = (importlib.reload(m) for m in (dck, mk, S, TL, TP, W))
 import unreal  # noqa: E402
 
 TR = S.TRAFFIC
@@ -62,7 +63,8 @@ def build_materials():
     m = mk.material(MATS, "M_Vehicle_NavBlink")
     phase = mk.expr(m, unreal.MaterialExpressionScalarParameter, -900, 300, parameter_name="Phase", default_value=0.0,
                     use_custom_primitive_data=True, primitive_data_index=0)
-    ins = {"Time": mk.expr(m, unreal.MaterialExpressionTime, -900, 0), "Phase": phase, "Col": mk.vector(m, "Color", nb["color"], -900, 100),
+    ins = {"Time": W.loop_time(m, -900, 0), "Phase": phase,  # the sequence's loop clock (prompt 10)
+           "Col": mk.vector(m, "Color", nb["color"], -900, 100),
            "Intensity": mk.scalar(m, "Intensity", nb["intensity"], -900, 400), "Period": mk.scalar(m, "Period", nb["period_s"], -900, 500),
            "Duty": mk.scalar(m, "Duty", nb["duty"], -900, 600)}
     c = mk.custom(m, NAV_HLSL, list(ins), unreal.CustomMaterialOutputType.CMOT_FLOAT3, -500, 0, "Nav blink")
@@ -178,14 +180,18 @@ def spawn(plan, meshes, mats):
 
 
 dck.ensure_map()
-replan = "--replan" in sys.argv
-plan = TP.main(replan=replan)
-meshes = import_vehicles()
-mats = build_materials()
-print(f"removed {clear_old()} old traffic actors")
-spawn(plan, meshes, mats)
-with open(TP.OUT_JSON, "w", encoding="utf-8") as f:
-    json.dump(plan, f)
-dck.LEVELS.save_current_level()
-lights = sum(len(a["lights"]) for a in plan["actors"])
-print(f"setup_traffic: {len(plan['actors'])} vehicles ({lights} lights), meshes {sorted(meshes)}; now run make_sweep.py")
+if "--materials" in sys.argv:  # rebuild the vehicle materials in place only
+    build_materials()
+    print("setup_traffic: materials rebuilt")
+else:
+    replan = "--replan" in sys.argv
+    plan = TP.main(replan=replan)
+    meshes = import_vehicles()
+    mats = build_materials()
+    print(f"removed {clear_old()} old traffic actors")
+    spawn(plan, meshes, mats)
+    with open(TP.OUT_JSON, "w", encoding="utf-8") as f:
+        json.dump(plan, f)
+    dck.LEVELS.save_current_level()
+    lights = sum(len(a["lights"]) for a in plan["actors"])
+    print(f"setup_traffic: {len(plan['actors'])} vehicles ({lights} lights), meshes {sorted(meshes)}; now run make_sweep.py")

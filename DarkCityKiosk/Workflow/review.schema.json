@@ -1,0 +1,20 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["round_id", "build_job_id", "prompt_sha256", "manifest_sha256", "verdict", "summary", "inspected_images", "reference_comparison", "previous_evidence_comparison", "findings", "unverified_requirements", "motion_verified", "loop_verified"],
+  "properties": {
+    "round_id": { "type": "string" },
+    "build_job_id": { "type": "string" },
+    "prompt_sha256": { "type": "string" },
+    "manifest_sha256": { "type": "string" },
+    "verdict": { "type": "string", "enum": ["PASS", "REVISE", "NEEDS INPUT"] },
+    "summary": { "type": "string" },
+    "inspected_images": { "type": "array", "items": { "type": "string" } },
+    "reference_comparison": { "type": "string" },
+    "previous_evidence_comparison": { "type": "string" },
+    "findings": { "type": "array", "items": { "type": "string" } },
+    "unverified_requirements": { "type": "array", "items": { "type": "string" } },
+    "motion_verified": { "type": "boolean", "enum": [false] },
+    "loop_verified": { "type": "boolean", "enum": [false] }
+  }
+}

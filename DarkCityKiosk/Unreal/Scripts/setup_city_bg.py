@@ -3,6 +3,7 @@
     node Scripts/ue.mjs Scripts/setup_city_bg.py              # (re)build, show the new city, hide the old
     node Scripts/ue.mjs Scripts/setup_city_bg.py --show old   # flip back to the Blender fill towers (no rebuild)
     node Scripts/ue.mjs Scripts/setup_city_bg.py --show new   # and forward again
+    node Scripts/ue.mjs Scripts/setup_city_bg.py --materials  # rebuild the two materials in place only
 
 Everything goes in the outliner folder City_Background (scene_config.CITY_BG["folder"]): one actor
 per group (Band1..Band4, Anchors, Landmark, Details) holding hierarchical instanced static mesh
@@ -16,7 +17,7 @@ Materials (/Game/DarkCity/CityBG/Materials):
                    world height so floors line up across setbacks. Lit windows cluster by floor and
                    block; the grid blends into its average glow once a window is under ~3 px.
   M_CityBG_Light   emissive with per-instance colour/intensity; beacons blink (1.5 s), neon pulses
-                   (7.5 s); both divide the 30 s and 300 s loops.
+                   (7.5 s); both divide the 30 s and 300 s loops, on the sequence's loop clock (prompt 10).
 After building it checks the flying cars against the new towers (traffic_lanes.City).
 """
 import importlib
@@ -32,8 +33,9 @@ import scene_config as S  # noqa: E402
 import city_bg_layout as LAY  # noqa: E402
 import traffic_lanes as TL  # noqa: E402
 import traffic_plan as TP  # noqa: E402
+import wetfx_hlsl as W  # noqa: E402
 
-dck, mk, S, LAY, TL, TP = (importlib.reload(m) for m in (dck, mk, S, LAY, TL, TP))
+dck, mk, S, LAY, TL, TP, W = (importlib.reload(m) for m in (dck, mk, S, LAY, TL, TP, W))
 import unreal  # noqa: E402
 
 C = S.CITY_BG
@@ -157,7 +159,7 @@ def build_light_material():
     mk.setp(m, used_with_instanced_static_meshes=True)
     ins = {"Col": custom_data(m, 0, -1200, 0, True), "I": custom_data(m, 3, -1200, 100), "Bl": custom_data(m, 4, -1200, 200),
            "Ph": custom_data(m, 5, -1200, 300), "Pu": custom_data(m, 6, -1200, 400),
-           "T": mk.expr(m, unreal.MaterialExpressionTime, -1200, 500)}
+           "T": W.loop_time(m, -1200, 500)}  # the sequence's loop clock (prompt 10), not engine Time
     for i, (k, v) in enumerate((("BlinkPeriod", 1.5), ("BlinkDuty", 0.3), ("PulsePeriod", 7.5), ("Scale", 1.0))):
         ins[k] = mk.scalar(m, k, v, -1200, 600 + i * 80)
     c = mk.custom(m, LIGHT_HLSL, list(ins), unreal.CustomMaterialOutputType.CMOT_FLOAT3, -800, 0, "Beacon / neon")
@@ -392,6 +394,9 @@ def check_traffic(layout):
 dck.ensure_map()
 if show:
     show_set(show)
+elif "--materials" in args:
+    build_materials()
+    print("setup_city_bg: materials rebuilt")
 else:
     layout = LAY.build_layout(log=lambda s: print(s))
     with open(os.path.join(dck.RAW, "city_bg.json"), "w", encoding="utf-8") as f:

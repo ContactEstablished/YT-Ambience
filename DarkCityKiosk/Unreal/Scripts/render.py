@@ -3,7 +3,9 @@
                                           [--spatial 1] [--temporal 1] [--warmup 48] [--fog-clear]
                                           [--sequence LS_Sweep]
 --sequence: which level sequence to render (LS_Review: the close-up review cameras, make_review.py).
---frames: one contiguous range per call, e.g. '0-720' (full sweep) or '180-181' (one still).
+--frames: one contiguous range per call, e.g. '0-720' (full sweep) or '180-181' (one still). A range past the
+sequence's playback end (LS_Sweep's crossfade tail: '0-744', see make_sweep.py) extends the playback range for that
+render only (saved, then restored when it finishes).
 Never queue several jobs: EasyRain's GPU particles crashed the editor at the MRQ job hand-over.
 Frames go to DarkCityKiosk/Renders/frames/<tag>/LS_Sweep.<frame>.png; encode a range with
 `node Scripts/encode.mjs <tag>`. Returns immediately: MRQ renders in a SEPARATE editor process
@@ -118,9 +120,22 @@ def set_fog_waves(active):
     return n
 
 
+playback_restore = None
+seq_asset = unreal.load_asset(SEQ)
+if ranges[-1][1] > seq_asset.get_playback_end():  # the tail past the loop end: the render process reads the saved asset
+    playback_restore = seq_asset.get_playback_end()
+    seq_asset.set_playback_end(ranges[-1][1])
+    dck.EAL.save_loaded_asset(seq_asset)
+    print(f"playback range extended to {ranges[-1][1]} for this render (restored to {playback_restore} after)")
+
+
 def on_finished(executor, success):
     if fog_clear:
         set_fog_waves(True)
+    if playback_restore is not None:
+        sq = unreal.load_asset(SEQ)
+        sq.set_playback_end(playback_restore)
+        dck.EAL.save_loaded_asset(sq)
     unreal.log(f"render.py: done ({'ok' if success else 'FAILED'}) -> {out_dir}")
 
 

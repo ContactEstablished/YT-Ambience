@@ -49,8 +49,11 @@ LIGHT_SCALE = 1.0  # multiplies every kiosk light below
 KIOSK_LIGHT_VOLUMETRIC = 0.55  # how much the kiosk lights glow in the fog (the halo round the kiosk)
 SOFFIT = {"intensity_cd": 8, "temperature": 3100, "tilt_to_wall_deg": 35, "height_cm": 6}
 CANOPY_SPILL = {"intensity_cd": 28, "color": (1.0, 0.62, 0.18), "down_deg": 25}
-INTERIOR = {"pos": (-1.075, -1.15, 1.67),  # in the service window (moved 10/4 with the wider kiosk)
-             "intensity_cd": 20, "temperature": 2800, "radius_m": 4}
+# Kitchen pass (10/9): L_Interior is now the kitchen's dim rear fill, at the fluorescent batten on the
+# rear ceiling (kiosk/kitchen.py room()); the bright work light at the opening is L_Kitchen_Prep
+# (KITCHEN_LIGHTS). Was: in the old recess at (-1.075, -1.15, 1.67), 20 cd, 2800 K, 4 m.
+INTERIOR = {"pos": (-1.05, -0.905, 2.03),
+            "intensity_cd": 15, "temperature": 3200, "radius_m": 2.8, "volumetric": 0.2}
 LANTERN_LIGHT = {"intensity_cd": 6, "temperature": 2300, "radius_m": 6}
 WINDOW_LIGHTBOX_LIGHT = {"intensity_cd": 7, "temperature": 5200}
 CORNER_SIGN_LIGHT = {"intensity_cd": 5, "color": (1.0, 0.8, 0.3), "radius_m": 4}
@@ -260,6 +263,11 @@ VIADUCT = {"x0": -80, "x1": 45.56, "y0": 11.5, "y1": 15.5, "deck_z": 14.0, "deck
 SWEEP = {
     "seconds": 30,
     "key_every_s": 0.5,
+    # Loop seam (prompt 10): LS_Sweep carries tail_s more past its loop end, keyed as the loop's first tail_s (camera,
+    # fog, train, traffic, crowd, the loop clock all wrap). The playback range stays the loop; render.py renders the tail
+    # when asked (--frames 0-744) and encode_loop.mjs crossfades it over the loop's first frames, so the rain particles
+    # (the one thing that can't repeat) flow across the seam instead of jumping.
+    "tail_s": 1.0,
 }
 
 # ---- City (scripted, from Blender build_city.py -> RawContent/city.glb + city_manifest.json) ----
@@ -573,6 +581,12 @@ GRAPHICS_LOOK = {
         # lit faces: well under the fascia (Lightbox_Yellow 2.8 on (1, 0.6, 0.07)); the faces' own colours tint them
         "KG_Signs": ("Signs", {"EmissiveStrength": 1.25, "StreakAmount": 0.6, "GrimeAmount": 0.6}),  # 1.9 read brighter than the fascia
         "KG_SignFrame": ("Signs", {"TileM": 0.256}),
+        # kitchen pass (10/9): the order terminal's screen and displays, tickets, labels (no kiosk weathering:
+        # their vertex alpha is 0); lit items glow dimly, a screen in a warm kitchen
+        "KG_Kitchen": ("Kitchen", {"EmissiveStrength": 2.0, "AgeTint": 0.3}),
+        # exterior pass (10/9): supplier stamps, bin signs, gas labels, tags, stencils, carton print, tape on the
+        # ground props (no kiosk weathering: vertex alpha 0); kiosk_exterior.py builds MI_KG_Exterior
+        "KG_Exterior": ("Exterior", {"AgeTint": 0.35}),
     },
     "lantern_ink": (0.025, 0.014, 0.008),
     # decal tweaks per item: opacity, tint (multiplies the art)
@@ -590,3 +604,221 @@ GRAPHICS_LOOK = {
 }
 # The 24h lightbox's light (L_Lantern_R moved in front of it); dimmer than the fascia's spill
 SIGN_24H_LIGHT = {"intensity_cd": 5, "temperature": 3000}
+
+# ---- Kitchen pass (2026-10-09, prompt 7): the working kitchen behind the service opening -------------
+# kiosk_kitchen.py builds M_Kitchen and one MI_KK_<material> per kitchen material. A material = a category
+# preset + the Blender build's colour / roughness / metal (kitchen.json) + overrides below. Masks: the
+# baked vertex colours (R convex edges -> EdgeWear, G occlusion below AOStart + B cavity -> Grime);
+# T_KitchenDetail (tiles every detail_tile m) gives smudges / fingerprints (Smudge), brushed grain
+# (Scratch) and water spots (Stain); the customer counter's sheet adds its own map (WearAmount, Polish).
+# Old but hygienic: grime only in corners and seams, smudges where hands go, no filth.
+KITCHEN_LOOK = {
+    "detail_tile": 0.5,
+    "defaults": {"Roughness": 0.5, "Metallic": 0.0, "EdgeWear": 0.0, "EdgeRough": 0.4, "EdgeMetal": 0.0, "Grime": 0.3, "AOStart": 0.3,
+                 "Smudge": 0.2, "Scratch": 0.2, "Stain": 0.1, "WearAmount": 0.0, "EmissiveStrength": 0.0, "Polish": 1.0,
+                 "BaseColor": (0.5, 0.5, 0.5), "EdgeColor": (0.6, 0.6, 0.6), "GrimeColor": (0.035, 0.03, 0.022), "Emissive": (0.0, 0.0, 0.0)},
+    "categories": {
+        "steel": {"Grime": 0.3, "AOStart": 0.25, "Smudge": 0.35, "Scratch": 0.7, "Stain": 0.25},
+        "paint": {"EdgeWear": 0.7, "EdgeColor": (0.30, 0.30, 0.29), "EdgeRough": 0.35, "EdgeMetal": 0.85, "Grime": 0.45, "AOStart": 0.35,
+                  "Smudge": 0.45, "Scratch": 0.3, "Stain": 0.15},
+        "ceramic": {"Grime": 0.15, "Smudge": 0.12, "Scratch": 0.05, "Stain": 0.1},
+        "plastic": {"Grime": 0.25, "Smudge": 0.35, "Scratch": 0.2, "Stain": 0.12},
+        "paper": {"Grime": 0.3, "Smudge": 0.1, "Scratch": 0.0, "Stain": 0.2},
+        "food": {"Grime": 0.0, "Smudge": 0.0, "Scratch": 0.0, "Stain": 0.0},
+        "glow": {"Grime": 0.0, "Smudge": 0.0, "Scratch": 0.0, "Stain": 0.0},
+    },
+    "materials": {
+        "KK_Steel": ("steel", {}), "KK_SteelWorn": ("steel", {"Smudge": 0.45, "Stain": 0.4}), "KK_Mesh": ("steel", {"Smudge": 0.2}),
+        "KK_Chrome": ("steel", {"Smudge": 0.3, "Scratch": 0.3}),
+        # the customer counter: its own wear map (polished pickup zone, scratches along it, faint rings, dark seams)
+        "KK_SteelCounter": ("steel", {"WearAmount": 1.0, "Polish": 1.0, "Smudge": 0.2, "Scratch": 0.3, "Stain": 0.12}),
+        "KK_POS": ("paint", {"EdgeColor": (0.18, 0.18, 0.17), "EdgeMetal": 0.0, "EdgeRough": 0.3, "Smudge": 0.6}),  # worn corners: darker plastic
+        "KK_POSDark": ("paint", {"EdgeColor": (0.28, 0.28, 0.28), "EdgeMetal": 0.9, "Smudge": 0.5}),
+        "KK_Cabinet": ("paint", {}), "KK_WallPaint": ("paint", {"EdgeWear": 0.1, "Grime": 0.35, "AOStart": 0.22, "Smudge": 0.15, "BaseColor": (0.58, 0.52, 0.41)}), "KK_Ceiling": ("paint", {"EdgeWear": 0.15, "Smudge": 0.0}), "KK_Floor": ("paint", {"EdgeWear": 0.0}),
+        "KK_CeramicWhite": ("ceramic", {}), "KK_CeramicRed": ("ceramic", {}), "KK_CeramicBlack": ("ceramic", {}),
+        "KK_Tile": ("ceramic", {"Grime": 0.25, "Stain": 0.2}), "KK_TileOld": ("ceramic", {"Grime": 0.35, "Stain": 0.3}),
+        "KK_Rubber": ("plastic", {}), "KK_PlasticBlack": ("plastic", {}), "KK_PlasticGrey": ("plastic", {"Smudge": 0.7}),
+        "KK_PlasticRed": ("plastic", {}), "KK_PlasticYellow": ("plastic", {}), "KK_PlasticGreen": ("plastic", {}),
+        "KK_PlasticCream": ("plastic", {}), "KK_PlasticBlue": ("plastic", {}), "KK_GlassDark": ("plastic", {"Smudge": 0.5}),
+        "KK_PaperCream": ("paper", {}), "KK_Kraft": ("paper", {}), "KK_Cardboard": ("paper", {}), "KK_Cloth": ("paper", {"Stain": 0.35}),
+        "KK_ClothBlue": ("paper", {}), "KK_Wood": ("paper", {"Stain": 0.4, "Grime": 0.2}), "KK_WoodDark": ("paper", {}),
+        "KK_Soy": ("food", {}), "KK_Broth": ("food", {}), "KK_Water": ("food", {}), "KK_Scallion": ("food", {}), "KK_Chashu": ("food", {}),
+        "KK_Menma": ("food", {}), "KK_Egg": ("food", {}), "KK_Nori": ("food", {}), "KK_Onion": ("food", {}), "KK_Beans": ("food", {}),
+        "KK_Grout": ("food", {}),
+        "KK_Lamp": ("glow", {}), "KK_LampHood": ("glow", {}), "KK_LampShelf": ("glow", {}), "KK_LED_Green": ("glow", {}),
+        "KK_LED_Amber": ("glow", {}), "KK_LED_Red": ("glow", {}), "KK_LED_Blue": ("glow", {}),
+    },
+    # emissive strengths (Emissive = the material's colour); the old interior panel Interior_Light stays at EMISSIVE
+    "emissive": {"KK_Lamp": 8.0, "KK_LampHood": 6.0, "KK_LampShelf": 5.0, "KK_LED_Green": 8.0, "KK_LED_Amber": 8.0, "KK_LED_Blue": 6.0},
+}
+# The kitchen's lights (positions from the Blender build, kitchen.json). First levels (prep 16, rear 9) left the
+# opening at 125 (8-bit luma) from the cinematic camera against 188 for the old flat cream recess: too dim for
+# "a richer warm glow". Now ~1.4x; the kiosk's own walls and the frame stay as they were. Brighter where the work happens
+# (the prep light at the opening, which also spills onto the customer counter), warm pools on the
+# cooking line, warmer and dimmer on the shelves, the back corners left to fall off.
+KITCHEN_LIGHTS = {
+    "L_Kitchen_Prep": {"intensity_cd": 24, "temperature": 3000, "radius_m": 4.0, "barn_deg": 55.0, "barn_cm": 8.0, "volumetric": 0.55},
+    "L_Kitchen_Hood_": {"intensity_cd": 6, "temperature": 2600, "radius_m": 1.8, "inner_deg": 25.0, "volumetric": 0.2},
+    "L_Kitchen_CeilingR": {"intensity_cd": 12, "temperature": 3200, "radius_m": 2.5, "barn_deg": 80.0, "barn_cm": 3.0, "volumetric": 0.2},
+    "L_Kitchen_Shelf_": {"intensity_cd": 3.5, "temperature": 2400, "radius_m": 1.5, "barn_deg": 80.0, "barn_cm": 2.0, "volumetric": 0.1},
+    "L_Kitchen_POS": {"intensity_cd": 0.4, "color": (0.45, 0.7, 1.0), "radius_m": 0.7, "volumetric": 0.0, "shadows": False},
+}
+
+# ---- Exterior pass (2026-10-09, prompt 8): the ground props round the footprint ---------------------------
+# kiosk_exterior.py builds M_Exterior and one MI_KX_<material> per prop material. A material = defaults + a
+# category preset + the Blender build's colour / roughness / metal (exterior.json) + overrides below.
+# Masks: the baked vertex masks (R edges, G occlusion with the kiosk and the slab, B cavity) and the kitchen's
+# tiling detail map at two scales. Rain comes from world position: wet outside the canopy's footprint,
+# wind-driven rain reaching Reach x (height below the canopy) under its edges, never onto tops under it, so
+# sheltered cartons stay dry and exposed crates, cage and locker read wet like the slab. Splash: dried mud
+# specks in a band SplashH cm above the slab (lighter than the dark plastics and paint, as dried mud is). Var: per-instance brightness spread (instanced props only).
+# edge_lift (rubbed edges: lighter, greyer) and fade_to (chalky sun fade) derive those colours per material.
+EXTERIOR_LOOK = {
+    "detail_tile": 0.5, "broad_tile": 2.2,  # metres per repeat of the detail map (UV0 is metre-scale planar)
+    "defaults": {"Roughness": 0.5, "Metallic": 0.0, "EdgeWear": 0.0, "EdgeRough": 0.5, "EdgeMetal": 0.0, "Grime": 0.35, "AOStart": 0.4,
+                 "Rust": 0.0, "Smudge": 0.2, "Scratch": 0.2, "Fade": 0.0, "Var": 0.0, "Splash": 0.6, "SplashH": 22.0, "Wet": 1.0,
+                 "WetDarken": 0.1, "Reach": 0.25, "WetSoft": 18.0, "EmissiveStrength": 0.0,
+                 "BaseColor": (0.5, 0.5, 0.5), "EdgeColor": (0.5, 0.5, 0.5), "GrimeColor": (0.035, 0.03, 0.022),
+                 "RustColor": (0.13, 0.052, 0.018), "FadeColor": (0.3, 0.3, 0.3), "MudColor": (0.22, 0.19, 0.15), "Emissive": (0.0, 0.0, 0.0)},
+    "categories": {
+        # moulded plastic: faded colour, corners rubbed paler and matte, handling scuffs
+        "plastic": {"edge_lift": 1.7, "fade_to": 0.35, "EdgeWear": 0.75, "EdgeRough": 0.72, "Fade": 0.45, "Grime": 0.3, "Smudge": 0.3,
+                    "Scratch": 0.45, "WetDarken": 0.04},
+        # enamelled steel: chips to bare steel at edges and handles, oxidation along seams and feet
+        "paint": {"EdgeWear": 0.85, "EdgeColor": (0.10, 0.096, 0.09), "EdgeMetal": 0.75, "EdgeRough": 0.38, "Rust": 0.6, "Fade": 0.3,
+                  "fade_to": 0.3, "Grime": 0.45, "Smudge": 0.25, "Scratch": 0.5, "WetDarken": 0.06},
+        # zinc: rubs brighter, white-rusts in seams, stains in the splash band
+        "galv": {"EdgeWear": 0.35, "EdgeColor": (0.46, 0.46, 0.45), "EdgeMetal": 0.95, "EdgeRough": 0.3, "Rust": 0.35,
+                 "RustColor": (0.33, 0.32, 0.30), "Grime": 0.5, "Smudge": 0.2, "Scratch": 0.5, "WetDarken": 0.03, "Splash": 0.8},
+        # timber: silvered by weather, edges rubbed, soaks up rain
+        "wood": {"edge_lift": 1.5, "fade_to": 0.55, "EdgeWear": 0.5, "EdgeRough": 0.85, "Fade": 0.6, "Grime": 0.55, "Smudge": 0.0,
+                 "Scratch": 0.3, "WetDarken": 0.3, "Splash": 0.9},
+        "paper": {"fade_to": 0.3, "Fade": 0.25, "Grime": 0.3, "Smudge": 0.15, "Scratch": 0.0, "WetDarken": 0.35, "Splash": 0.8},
+        "concrete": {"Grime": 0.55, "Smudge": 0.0, "Scratch": 0.1, "WetDarken": 0.3, "Splash": 0.4},
+        "rubber": {"fade_to": 0.5, "Fade": 0.4, "Grime": 0.2, "Smudge": 0.2, "Scratch": 0.2, "WetDarken": 0.0, "Splash": 0.7},
+        "glass": {"Grime": 0.25, "Smudge": 0.45, "Scratch": 0.15, "WetDarken": 0.0, "Splash": 0.3},
+        "metal": {"edge_lift": 1.3, "EdgeWear": 0.4, "EdgeMetal": 1.0, "EdgeRough": 0.25, "Grime": 0.45, "Smudge": 0.35, "Scratch": 0.4,
+                  "WetDarken": 0.0},
+        "food": {"Grime": 0.0, "Smudge": 0.0, "Scratch": 0.0, "Splash": 0.0, "WetDarken": 0.0},
+    },
+    "materials": {
+        "KX_CrateBlue": ("plastic", {"Var": 0.25}), "KX_CrateGreen": ("plastic", {"Var": 0.25}),
+        # the red accent: sun-faded toward a dusty coral, rubbed pink at the corners
+        "KX_CrateRed": ("plastic", {"Var": 0.2, "Fade": 0.25}),
+        "KX_ToteGrey": ("plastic", {"Var": 0.2, "EdgeWear": 0.5}), "KX_ToteLid": ("plastic", {"Var": 0.2}),
+        # the customer bin: handling scuffs, splash marks along its foot. Prompt 10: its broad sun-fade patches, scratch specks
+        # and smudges read as mottling at 4K (was Fade 0.45 via the category, Scratch 0.7, Smudge 0.5); the rubbed edges and
+        # the splash band at the foot carry the wear now
+        "KX_BinBody": ("plastic", {"Scratch": 0.45, "Splash": 1.2, "SplashH": 28.0, "Grime": 0.45, "EdgeWear": 1.0, "Smudge": 0.35, "Fade": 0.3}),
+        "KX_BinLid": ("plastic", {"Fade": 0.5, "EdgeWear": 0.9, "Smudge": 0.45}),
+        "KX_LockerPaint": ("paint", {"Rust": 0.9, "Fade": 0.45}),
+        "KX_CabinetPaint": ("paint", {"Rust": 0.5}),
+        "KX_CaseOlive": ("paint", {"Rust": 0.85, "EdgeWear": 1.0}),
+        "KX_CylinderGrey": ("paint", {"Var": 0.15, "Rust": 0.45, "EdgeWear": 0.7}),
+        "KX_SteelDark": ("paint", {"EdgeColor": (0.16, 0.155, 0.15), "Rust": 0.5, "Fade": 0.0}),
+        "KX_GasPipe": ("paint", {"Rust": 0.3}),
+        # the cans bin (and the cage): prompt 10: on wet zinc every matte white-rust or grime patch sits next to mirror-like
+        # metal reflecting the city, which read as heavy mottling at 4K; white rust kept to the seams, lighter grime
+        "KX_Galv": ("galv", {"Rust": 0.12, "Grime": 0.32, "Scratch": 0.3}),
+        "KX_Wood": ("wood", {}), "KX_WoodDark": ("wood", {"Fade": 0.35}),
+        "KX_Cardboard": ("paper", {}),
+        "KX_Concrete": ("concrete", {}),
+        "KX_Rubber": ("rubber", {}), "KX_HoseGreen": ("rubber", {"Fade": 0.3}),
+        "KX_GlassBrown": ("glass", {"Var": 0.2}), "KX_GlassGreen": ("glass", {"Var": 0.2}),
+        "KX_Brass": ("metal", {"Grime": 0.6}), "KX_Copper": ("metal", {}), "KX_Chrome": ("metal", {"Smudge": 0.4}),
+        "KX_Cabbage": ("food", {"Var": 0.3}), "KX_Negi": ("food", {}), "KX_NegiWhite": ("food", {}),
+    },
+    "emissive": {},
+}
+
+# ---- Rain contact, drips and steam (2026-10-09, prompt 9; wet_fx.py) --------------------------------------------
+# Where the water goes comes from Blender (build_rain_contact.py -> RawContent/rain/T_RainContact.png +
+# rain_contact.json: the platform's wet map, drip sources and landing spots, downpipe mouths, steam sources). These
+# numbers say how it looks and moves. Every animated effect runs on the MPC_WetFX loop clock (make_sweep.py keys it),
+# completes whole cycles per loop and so joins the seam exactly. Water and steam switch separately:
+#   node Scripts/ue.mjs Scripts/wet_fx.py --water off|on --steam off|on --contact off|on
+WET_FX = {
+    # the platform's wet layer (M_KioskWeathered's rain-contact branch, on MI_KW_Platform_Concrete only)
+    "contact": {
+        "ContactAmount": 1.0,  # master for the platform's wetness (0 = the slab as before)
+        "WetDark": 0.52,  # damp concrete darkens
+        "WetRough": 0.14, "PoolRough": 0.03, "PoolDark": 0.12,
+        "ContactDark": 0.32,  # moist grime round feet, bases and the wall foot
+        "DetailAmt": 0.6, "DetailTile": 0.85, "DetailAvg": 0.22,  # concrete texture: tone and roughness variation (world-mapped)
+        "RippleAmt": 0.22, "RippleTiling": 1.4, "RippleSpeed": 1.0,  # raindrop rings where rain lands on water / wet concrete
+        "RingAmt": 0.35, "RingSpeed": 0.30, "RingDur": 0.55,  # rings where each canopy drip lands
+        "EdgeStreak": 1.0,  # wet runoff streaks down the slab's sides below the lip
+        "DebugMap": 0.0,  # 1 = show the wet map as colour on the platform (R damp, G standing water, B rain)
+    },
+    # the street puddles' raindrop rings move to the loop clock too (same look as EasyRain's, now seam-exact)
+    "ground_ripples_loop_clock": True,
+    # canopy drips (positions from rain_contact.json): period s (divides the loop; slots), skip = share of slots that
+    # stay dry (irregular timing), size = drop diameter m, seed. The edge box drips a little faster and larger.
+    "drips": {
+        "corner_fl": {"period": 1.5, "skip": 0.35, "size": 0.0045, "seed": 1.3},
+        "front_joint": {"period": 3.0, "skip": 0.45, "size": 0.0040, "seed": 2.7},
+        "edge_box": {"period": 0.75, "skip": 0.18, "size": 0.0062, "seed": 4.1},
+        "left_joint": {"period": 2.5, "skip": 0.40, "size": 0.0040, "seed": 5.9},
+        "right_edge": {"period": 2.0, "skip": 0.40, "size": 0.0042, "seed": 7.3},
+    },
+    "drip_look": {"width_m": 0.16, "Streak": 1.0, "SplashDur": 0.16, "SplashV": 1.1, "Grow": 0.45, "Opacity": 1.0,
+                  "WaterColor": (0.45, 0.47, 0.5), "Roughness": 0.05, "Specular": 1.0,
+                  # a drop refracts a wide patch of its surroundings: it shows the bright fascia it drips from (sampled
+                  # RefractUp of the frame above it), so it catches the sign's warm light near the top and dims as it falls
+                  "Refract": 1.2, "RefractUp": 0.05},
+    # downpipe trickles: shoe mouth onto the splash block (beads streaming at Flow m/s, Skip = gaps)
+    "trickles": {"pipe_fr": {"flow": 0.55, "skip": 0.55, "size": 0.005, "seed": 3.3},
+                 "pipe_bl": {"flow": 0.45, "skip": 0.7, "size": 0.0045, "seed": 8.8}},
+    "trickle_look": {"width_m": 0.10, "Streak": 0.75, "SplashDur": 0.12, "SplashV": 0.6, "Refract": 0.35},
+    # steam: cards turned to the camera, density from noise carried upward (whole tiles per loop), lit by the scene's own
+    # lights through the translucency volume (no glow of its own). Prompt 10 (M_FX_Steam reworked, wetfx_hlsl.STEAM_HLSL):
+    # the noise is laid out in metres (the old card-unit noise stretched eddies into vertical streaks on tall cards), the
+    # column meanders, widens and thins as it rises and breaks into wisps higher up, its sides eaten by the noise; cards
+    # are wide enough that the plume fades out well inside them. Base / Spread m (half-width at the source / per m of
+    # rise), Rise m/s, Sway cycles/s, SwayAmp m of meander per m of rise, Scale eddy frequency (1 = billows ~0.3 m),
+    # Thresh / Breakup / Soft: the density threshold at the source, its climb by the top, its softness (the noise's mean
+    # is 0.51, sd ~0.08 for the blend read: Thresh 0.40 keeps the core filled, +Breakup by the top leaves only wisps).
+    "steam": {
+        # kept faint (prompt 10): the stock pot, the prep area and the kitchen's darker depth must stay readable through it
+        "pot": {"cards": [{"w": 0.50, "h": 0.40, "seed": 0.21, "yaw_off": 0.0}],
+                "Opacity": 0.55, "Rise": 0.18, "Sway": 0.1, "SwayAmp": 0.08, "Base": 0.05, "Spread": 0.25, "Scale": 3.0,
+                "Thresh": 0.42, "Breakup": 0.10, "Soft": 0.18, "Lean": 0.0, "Fade": 6.0,
+                # the hood lamps shine straight down through it; the translucency lighting volume is too coarse to catch
+                # their narrow cones, so their in-scatter is carried here (warm, about the lamps' colour)
+                "Ambient": (0.45, 0.36, 0.25)},
+        # from the floor camera the corner HVAC hides the fan: the plume shows once it climbs past ~6 m, so the cards are tall
+        # and lean toward the street side (kiosk +X) as they thin out
+        "roof_fan": {"cards": [{"w": 3.6, "h": 3.4, "seed": 0.63, "dx": 0.0}, {"w": 3.0, "h": 2.8, "seed": 0.11, "dx": 0.15}],
+                     "Opacity": 0.34, "Rise": 0.30, "Sway": 1.0 / 15.0, "SwayAmp": 0.06, "Base": 0.25, "Spread": 0.22, "Scale": 1.0,
+                     "Thresh": 0.37, "Breakup": 0.12, "Soft": 0.24, "Lean": 0.9, "Fade": 15.0,
+                     # nothing lights the roof: what reveals a plume up here is scattered city glow, so it carries an
+                     # in-scatter term (grey-blue, like the haze); keep it a soft grey wisp, never a white cloud
+                     "Ambient": (0.30, 0.34, 0.38)},
+        # the flue's vapour (warm, moist combustion gas condensing in the cold rain): leaves under the rain cap, thin; the
+        # plume the cinematic camera sees above the roof
+        "flue": {"cards": [{"w": 2.6, "h": 2.8, "seed": 0.37, "dx": 0.0}],
+                 "Opacity": 0.50, "Rise": 0.45, "Sway": 1.0 / 10.0, "SwayAmp": 0.06, "Base": 0.10, "Spread": 0.22, "Scale": 1.0,
+                 "Thresh": 0.37, "Breakup": 0.12, "Soft": 0.24, "Lean": 0.6, "Fade": 12.0,
+                 "Ambient": (0.34, 0.38, 0.42)},
+    },
+    "steam_look": {"SteamColor": (0.80, 0.80, 0.80), "Ambient": (0.0, 0.0, 0.0), "wind": (0.95, -0.3)},  # the plume drifts toward kiosk +X, a little back (Unreal +X, -Y)
+}
+
+# ---- Final polish (prompt 10, 2026-10-10; polish.py) ----------------------------------------------------------------
+# Roof light. From the floor camera the roof machinery read as one dark mass against the viaduct's underside (4K
+# luma: HVAC faces ~18, condenser ~10, against ~29 behind them). Two soft, shadowed spot lights stand in for light that
+# is really there: the city and the wet street behind the camera (cool, broad, from the front-left and ~35 deg up, so
+# the faces the orbit sees catch it and the gaps between units stay in shadow) and the SAME CITY screen to the right
+# (its own blue: a rim along the right-hand units' sides and tops). Lighting channel 1 only, and only the roof
+# machinery's actor joins channel 1, so the fascia, canopy, deck, walls, street and props are untouched; no
+# volumetric scattering (no beam in the fog); MegaLights off for these two (the classic path honours channels).
+# Positions are the Blender kiosk frame (m).
+ROOF_LIGHT = {
+    "actors": ["SM_Kiosk_Roof"],
+    "lights": {
+        "L_Roof_CityBounce": {"pos": (-5.55, -5.20, 8.0), "target": (-0.60, -0.60, 3.45), "cd": 150.0, "color": (0.62, 0.72, 0.86),
+                              "outer_deg": 30.0, "inner_deg": 6.0, "source_radius_m": 2.0, "radius_m": 12.0, "specular": 0.5},
+        "L_Roof_ScreenRim": {"pos": (6.30, 0.20, 8.0), "target": (0.20, -0.60, 3.60), "cd": 120.0, "color": (0.50, 0.75, 1.00),
+                             "outer_deg": 30.0, "inner_deg": 6.0, "source_radius_m": 1.5, "radius_m": 12.0, "specular": 0.6},
+    },
+}

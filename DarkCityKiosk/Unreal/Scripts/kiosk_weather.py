@@ -29,6 +29,9 @@ import scene_config as S  # noqa: E402
 
 dck, mk, S = importlib.reload(dck), importlib.reload(mk), importlib.reload(S)
 import unreal  # noqa: E402
+import wetfx_hlsl as W  # noqa: E402
+
+W = importlib.reload(W)
 
 MEL = unreal.MaterialEditingLibrary
 FOLDER = f"{dck.GAME}/Kiosk/Weather"
@@ -222,6 +225,30 @@ def build_material():
     e2 = mk.expr(m, unreal.MaterialExpressionMultiply, -550, 700)
     mk.link(e1, "", e2, "A")
     mk.link(emul, "", e2, "B")
+    # rain contact pass (prompt 9): the platform's wet layer, behind a static switch that only
+    # MI_KW_Platform_Concrete turns on (wet_fx.py), so every other kiosk material compiles exactly as before
+    if dck.EAL.does_asset_exist(W.RAIN_MAP) and dck.EAL.does_asset_exist(W.MPC):
+        rc = W.rain_contact_branch(m, outs[0], -1000, 1400, S.WET_FX["contact"])
+        rgb2 = mk.expr(m, unreal.MaterialExpressionComponentMask, -500, 1400, r=True, g=True, b=True, a=False)
+        rough2 = mk.expr(m, unreal.MaterialExpressionComponentMask, -500, 1550, r=False, g=False, b=False, a=True)
+        nws = mk.expr(m, unreal.MaterialExpressionComponentMask, -500, 2100, r=True, g=True, b=True, a=False)
+        mk.link(rc[0], "", rgb2, "")
+        mk.link(rc[0], "", rough2, "")
+        mk.link(rc[1], "", nws, "")
+        nts = mk.expr(m, unreal.MaterialExpressionTransform, -350, 2100,
+                      transform_source_type=unreal.MaterialVectorCoordTransformSource.TRANSFORMSOURCE_WORLD,
+                      transform_type=unreal.MaterialVectorCoordTransform.TRANSFORM_TANGENT)
+        mk.link(nws, "", nts, "")
+        flat = mk.expr(m, unreal.MaterialExpressionConstant3Vector, -350, 2250, constant=unreal.LinearColor(0.0, 0.0, 1.0, 0.0))
+        sw = {}
+        for key, (on, off) in (("col", (rgb2, rgb)), ("rough", (rough2, rough)), ("nrm", (nts, flat))):
+            s_ = mk.expr(m, unreal.MaterialExpressionStaticSwitchParameter, -150, {"col": -400, "rough": -250, "nrm": 2100}[key],
+                         parameter_name="UseRainContact", default_value=False)
+            mk.link(on, "", s_, "True")
+            mk.link(off, "", s_, "False")
+            sw[key] = s_
+        rgb, rough = sw["col"], sw["rough"]
+        mk.out(m, sw["nrm"], "", unreal.MaterialProperty.MP_NORMAL)
     mk.out(m, rgb, "", unreal.MaterialProperty.MP_BASE_COLOR)
     mk.out(m, rough, "", unreal.MaterialProperty.MP_ROUGHNESS)
     mk.out(m, metal, "", unreal.MaterialProperty.MP_METALLIC)

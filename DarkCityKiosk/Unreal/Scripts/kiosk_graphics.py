@@ -45,7 +45,7 @@ GLB = "kiosk_graphics"
 WX_TEX = f"{dck.GAME}/Kiosk/Weather/Textures"
 KIOSK_MATS = f"{dck.KIOSK_MESHES}/{dck.KIOSK_GLB}/Materials"
 RAW_G = os.path.join(dck.RAW, "graphics")
-ATLASES = ("Paper", "Labels", "Signs", "Decals")
+ATLASES = ("Paper", "Labels", "Signs", "Decals", "Kitchen", "Exterior")  # Kitchen: kitchen pass (10/9); Exterior: exterior pass (10/9)
 LOOK = S.GRAPHICS_LOOK
 
 # ---- 1. textures ---------------------------------------------------------------------------------

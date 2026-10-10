@@ -1,0 +1,18 @@
+{
+  "poll_seconds": 600,
+  "job_timeout_seconds": 3600,
+  "automated_deletion": false,
+  "codex": {
+    "executable": "C:/Program Files/nodejs/node.exe",
+    "prefix": ["C:/Users/matth/AppData/Roaming/npm/node_modules/@openai/codex/bin/codex.js"]
+  },
+  "claude": { "executable": "C:/Users/matth/.local/bin/claude.exe" },
+  "features": {
+    "train-baseline": {
+      "authorization": "User request 2026-10-10: TRAIN-00 small baseline capture/assessment; optional TRAIN-01 draft only, left unqueued. No redesign.",
+      "authorized_rounds": ["TRAIN-00"],
+      "max_rounds": 1,
+      "max_corrective_rounds": 0
+    }
+  }
+}

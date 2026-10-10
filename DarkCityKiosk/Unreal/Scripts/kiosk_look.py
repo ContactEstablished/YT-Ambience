@@ -59,5 +59,8 @@ for name, strength in S.EMISSIVE.items():
         MEL.set_material_instance_scalar_parameter_value(mi, "EmissiveStrength", strength)
         MEL.update_material_instance(mi)
         dck.EAL.save_loaded_asset(mi)
+if dck.EAL.does_asset_exist(f"{dck.GAME}/Kiosk/Kitchen/M_Kitchen"):  # kitchen pass (10/9): its lights and L_Interior's new range
+    import kiosk_kitchen  # noqa: E402
+    importlib.reload(kiosk_kitchen).lights(kiosk_kitchen.data())
 dck.LEVELS.save_current_level()
 print(f"kiosk_look: {n} kiosk lights (x{S.LIGHT_SCALE}, fog glow {S.KIOSK_LIGHT_VOLUMETRIC}), {m} glowing materials")

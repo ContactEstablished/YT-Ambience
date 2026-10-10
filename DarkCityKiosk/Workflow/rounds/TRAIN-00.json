@@ -1,0 +1,9 @@
+{
+  "feature": "train-baseline",
+  "required_images": ["current-mid.png", "current-train.png", "accepted-mid.png", "accepted-train.png"],
+  "minimum_image_size": [1920, 1080],
+  "required_captures": [
+    { "tag": "TRAIN-00-mid", "image": "current-mid.png" },
+    { "tag": "TRAIN-00-train", "image": "current-train.png" }
+  ]
+}

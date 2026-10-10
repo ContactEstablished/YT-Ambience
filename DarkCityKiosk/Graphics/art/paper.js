@@ -6,12 +6,15 @@
   const items = (A.items = A.items || []);
   const add = (it) => items.push(Object.assign({ atlas: 'Paper', margin: 0 }, it));
 
-  // The street brand of the city (KAZE screens on the towers): small poster, cool blue/cyan + red,
-  // the newest paper in the door-wall cluster (relatively intact).
+  // The street brand of the city (KAZE screens on the towers): small poster, cool blue/cyan + red, the newest paper
+  // in the door-wall cluster, but a season old (prompt 10: it read as clean and new): sun-faded toward cyan with a
+  // paler red band, the blacks lifted, water-stained up from the bottom, faint streaks from the box's drip line above,
+  // grimy edges, a small tear at the lower right.
   add({
     name: 'kaze_poster', w: 280, h: 400, margin: 10,
-    age: { seed: 1, paper: [0.93, 0.94, 0.95], rough: 0.5, absorb: 0.75, yellow: 0.03, fade: 0.12, dirt: 0.06, edgeDirt: 0.25,
-      stains: 0.12, stainBias: 'bottom', stainScale: 30, crease: [['h', 0.5, 1.4, 0.25], ['v', 0.5, 1.0, 0.15]], wrinkle: 0.12,
+    age: { seed: 1, paper: [0.93, 0.94, 0.95], rough: 0.58, absorb: 0.75, yellow: 0.1, fade: 0.55, bleach: 0.24, dirt: 0.28, edgeDirt: 0.5,
+      stains: 0.46, stainBias: 'bottom', stainScale: 30, streaks: 0.26, crease: [['h', 0.5, 1.4, 0.25], ['v', 0.5, 1.0, 0.15]], wrinkle: 0.22,
+      tears: [{ a: [0.80, 1.02], b: [1.02, 0.91], jag: 4, keep: 1, seed: 5 }],
       tape: [{ x: 0.02, y: 0.01, w: 34, h: 13, rot: -0.7, clear: true }, { x: 0.985, y: 0.012, w: 34, h: 13, rot: 0.75, clear: true },
         { x: 0.02, y: 0.985, w: 30, h: 12, rot: 0.6, color: [0.82, 0.76, 0.6] }] },
     draw(g) {

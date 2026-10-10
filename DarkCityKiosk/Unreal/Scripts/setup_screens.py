@@ -7,8 +7,12 @@ screen slots on the city meshes, and tints each screen's glow light with its ave
 
 All motion repeats on whole fractions of the loop: slides every slide_seconds (7.5 s -> a
 15 s two-slide cycle; 30 s and 300 s loops hold whole cycles), refresh band 0.7 Hz (21 per 30 s).
+It runs on the sequence's loop clock (MPC_WetFX LoopTime, wetfx_hlsl.loop_time; prompt 10), not the
+engine's Time, so every render process shows the same slide at the same frame and the seam joins.
+screens.json offsets keep every slide change clear of the loop seam.
 
     node Scripts/ue.mjs Scripts/setup_screens.py
+    node Scripts/ue.mjs Scripts/setup_screens.py --materials   # rebuild M_LEDScreen / M_NeonSign + instance numbers only
 """
 import importlib
 import json
@@ -19,8 +23,9 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import dck  # noqa: E402
 import matkit as mk  # noqa: E402
 import scene_config as S  # noqa: E402
+import wetfx_hlsl as W  # noqa: E402
 
-dck, mk, S = importlib.reload(dck), importlib.reload(mk), importlib.reload(S)
+dck, mk, S, W = importlib.reload(dck), importlib.reload(mk), importlib.reload(S), importlib.reload(W)
 import unreal  # noqa: E402
 
 SCREENS = f"{dck.GAME}/City/Screens"
@@ -75,7 +80,7 @@ def build_led_material():
     sb = mk.expr(m, unreal.MaterialExpressionTextureSampleParameter2D, -1150, 200, parameter_name="SlideB")
     for s in (sa, sb):
         mk.link(quv, "", s, "UVs")
-    time = mk.expr(m, unreal.MaterialExpressionTime, -1150, 450)
+    time = W.loop_time(m, -1150, 450)
     names = ["UV", "Res", "A", "B", "Time", "Slot", "Trans", "Offset", "Intensity", "Scan"]
     led = mk.custom(m, LED_HLSL, names, unreal.CustomMaterialOutputType.CMOT_FLOAT3, -800, 0, "LED screen")
     mk.link(tc, "", led, "UV")
@@ -97,7 +102,7 @@ def build_led_material():
 def build_neon_material():
     m = mk.material(SCREENS, "M_NeonSign")
     tex = mk.expr(m, unreal.MaterialExpressionTextureSampleParameter2D, -900, 0, parameter_name="Sign")
-    time = mk.expr(m, unreal.MaterialExpressionTime, -900, 300)
+    time = W.loop_time(m, -900, 300)
     off = mk.scalar(m, "Offset", 0.0, -900, 400)
     st = mk.custom(m, NEON_HLSL, ["Time", "Offset"], unreal.CustomMaterialOutputType.CMOT_FLOAT1, -650, 300, "Neon stutter")
     mk.link(time, "", st, "Time")
@@ -137,16 +142,28 @@ def import_textures():
     return texs
 
 
+def load_textures():
+    texs = {}
+    for f in sorted(os.listdir(SRC)):
+        if f.startswith("T_Screen_") and f.endswith(".png"):
+            tex = unreal.load_asset(f"{SCREENS}/Textures/{os.path.splitext(f)[0]}")
+            if tex:
+                texs[os.path.splitext(f)[0]] = tex
+    return texs
+
+
 def set_tex(mi, param, tex):
     mk.MEL.set_material_instance_texture_parameter_value(mi, param, tex)
 
 
 dck.ensure_map()
-# Rebuild the screen images first (picks up any new art in DarkCityKiosk/_ads/)
-import subprocess  # noqa: E402
-r = subprocess.run(["pwsh", "-NoProfile", "-File", os.path.join(os.path.dirname(os.path.abspath(__file__)), "make_screens.ps1")],
-                   capture_output=True, text=True, encoding="utf-8")
-print(r.stdout.strip() or r.stderr.strip())
+materials_only = "--materials" in sys.argv  # keep the imported images; rebuild the materials, re-apply the numbers
+if not materials_only:
+    # Rebuild the screen images first (picks up any new art in DarkCityKiosk/_ads/)
+    import subprocess  # noqa: E402
+    r = subprocess.run(["pwsh", "-NoProfile", "-File", os.path.join(os.path.dirname(os.path.abspath(__file__)), "make_screens.ps1")],
+                       capture_output=True, text=True, encoding="utf-8")
+    print(r.stdout.strip() or r.stderr.strip())
 with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "screens.json"), encoding="utf-8") as f:
     cfg = json.load(f)
 with open(os.path.join(dck.RAW, "city_manifest.json"), encoding="utf-8") as f:
@@ -155,7 +172,7 @@ with open(os.path.join(SRC, "screen_colors.json"), encoding="utf-8-sig") as f:
     colours = json.load(f)
 
 led_m, neon_m = build_led_material(), build_neon_material()
-texs = import_textures()
+texs = load_textures() if materials_only else import_textures()
 mis = {}
 for name, sc in cfg["screens"].items():
     ms = manifest.get(name)
